@@ -1,0 +1,127 @@
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import Lenis from 'lenis';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const REDUCED = '(prefers-reduced-motion: reduce)';
+const prefersReduced = matchMedia(REDUCED).matches;
+const isTouch = matchMedia('(pointer: coarse)').matches;
+
+const NAV_OFFSET = 80; // keep in sync with `scroll-padding-top: 5rem` in global.css
+
+function initLenis(): Lenis | null {
+  if (prefersReduced || isTouch) return null;
+  const lenis = new Lenis();
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((t) => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+  // Same-page anchors (hrefs are base-prefixed like /portfolio/#apps, so handle them ourselves)
+  document.addEventListener('click', (e) => {
+    const a = (e.target as Element).closest<HTMLAnchorElement>('a[href*="#"]');
+    if (!a || a.target === '_blank') return;
+    const url = new URL(a.href, location.href);
+    if (url.pathname !== location.pathname || !url.hash || url.hash === '#main') return;
+    const target = document.querySelector<HTMLElement>(url.hash);
+    if (!target) return;
+    e.preventDefault();
+    lenis.scrollTo(target, { offset: -NAV_OFFSET });
+    history.pushState(null, '', url.hash);
+  });
+  return lenis;
+}
+
+function initReveals() {
+  gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((el) => {
+    gsap.from(el, {
+      opacity: 0, y: 16, duration: 0.7, ease: 'power2.out',
+      scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+    });
+  });
+}
+
+function initTyping() {
+  const el = document.querySelector<HTMLElement>('[data-typing]');
+  if (!el) return;
+  const text = el.textContent ?? '';
+  el.setAttribute('aria-label', text);
+  el.textContent = '';
+  let i = 0;
+  const id = setInterval(() => {
+    el.textContent = text.slice(0, ++i);
+    if (i >= text.length) clearInterval(id);
+  }, 90);
+}
+
+function initHeroCycle() {
+  const imgs = document.querySelectorAll<HTMLImageElement>('[data-hero-phone] [data-phone] img');
+  if (imgs.length < 2) return;
+  let active = 0;
+  setInterval(() => {
+    if (document.hidden) return;
+    imgs[active].style.opacity = '0';
+    active = (active + 1) % imgs.length;
+    imgs[active].style.opacity = '1';
+  }, 3200);
+}
+
+function initShowcase(lenis: Lenis | null) {
+  const section = document.querySelector<HTMLElement>('[data-showcase]');
+  if (!section) return;
+  const items = Array.from(section.querySelectorAll<HTMLElement>('[data-showcase-list] > li'));
+  const stage = Array.from(section.querySelectorAll<HTMLElement>('[data-stage-phone]'));
+  const rail = Array.from(section.querySelectorAll<HTMLButtonElement>('[data-rail-index]'));
+  const glow = section.querySelector<HTMLElement>('[data-showcase-glow]');
+
+  const setActive = (i: number) => {
+    stage.forEach((p, j) => {
+      p.style.opacity = j === i ? '1' : '0';
+      p.style.transform = j === i ? 'translateY(0)' : `translateY(${j < i ? -24 : 24}px)`;
+    });
+    rail.forEach((b, j) => b.setAttribute('aria-current', String(j === i)));
+    const accent = items[i]?.dataset.accent;
+    if (glow && accent) glow.style.background = `radial-gradient(600px circle at 25% 50%, ${accent}55, transparent 70%)`;
+  };
+
+  const mm = gsap.matchMedia();
+  mm.add(`(min-width: 1024px) and (prefers-reduced-motion: no-preference)`, () => {
+    section.classList.add('showcase--enhanced');
+    setActive(0);
+    const triggers = items.map((item, i) =>
+      ScrollTrigger.create({
+        trigger: item, start: 'top center', end: 'bottom center',
+        onToggle: (self) => self.isActive && setActive(i),
+      }),
+    );
+    const inView = ScrollTrigger.create({
+      trigger: section, start: 'top center', end: 'bottom center',
+      onToggle: (self) => section.classList.toggle('showcase--in-view', self.isActive),
+    });
+    const onRail = (e: Event) => {
+      const i = Number((e.currentTarget as HTMLElement).dataset.railIndex);
+      const target = items[i];
+      if (lenis) lenis.scrollTo(target, { offset: 0 });
+      else target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      setActive(i);
+    };
+    rail.forEach((b) => b.addEventListener('click', onRail));
+    ScrollTrigger.refresh();
+    return () => {
+      triggers.forEach((t) => t.kill());
+      inView.kill();
+      rail.forEach((b) => b.removeEventListener('click', onRail));
+      section.classList.remove('showcase--enhanced', 'showcase--in-view');
+      if (glow) glow.style.background = '';
+    };
+  });
+}
+
+if (!prefersReduced) {
+  document.documentElement.classList.add('motion-ready');
+  const lenis = initLenis();
+  initReveals();
+  initTyping();
+  initHeroCycle();
+  initShowcase(lenis);
+  addEventListener('load', () => ScrollTrigger.refresh());
+}

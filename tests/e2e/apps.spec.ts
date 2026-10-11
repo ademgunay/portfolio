@@ -37,6 +37,8 @@ test('store badges open in a new tab; non-live apps show a note instead', async 
   }
 });
 
+test.describe('stacked cards (motion enhancement off, card phones are display:none when enhanced)', () => {
+test.use({ reducedMotion: 'reduce' });
 test('every app screenshot has loaded with real dimensions', async ({ page }) => {
   await gotoHome(page);
   const imgs = page.locator('[data-card-phone] img');
@@ -44,4 +46,5 @@ test('every app screenshot has loaded with real dimensions', async ({ page }) =>
     await img.scrollIntoViewIfNeeded();
     await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
   }
+});
 });
