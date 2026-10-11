@@ -13,6 +13,6 @@ export default defineConfig({
   },
   projects: [
     { name: 'desktop', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
-    { name: 'mobile', use: { ...devices['Pixel 7'] }, testMatch: /motion\.spec\.ts|apps\.spec\.ts/ },
+    { name: 'mobile', use: { ...devices['Pixel 7'] }, testMatch: /motion\.spec\.ts|apps\.spec\.ts|mobile\.spec\.ts/ },
   ],
 });
