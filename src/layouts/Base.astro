@@ -7,11 +7,13 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { profile } from '../content/profile';
 import { withBase } from '../lib/url';
+import { pick, t, type Lang } from '../i18n/ui';
 
-interface Props { title?: string; description?: string; image?: string; type?: 'website' | 'article' }
+interface Props { lang: Lang; title?: string; description?: string; image?: string; type?: 'website' | 'article' }
 const {
-  title = `${profile.name} — ${profile.title}`,
-  description = profile.summary,
+  lang,
+  title = `${profile.name} — ${pick(profile.title, lang)}`,
+  description = pick(profile.summary, lang),
   image = withBase('/og-image.png'),
   type = 'website',
 } = Astro.props;
@@ -22,6 +24,7 @@ const personLd = {
   '@type': 'Person',
   name: profile.name,
   jobTitle: 'Lead Frontend Engineer',
+  description: pick(profile.summary, lang),
   email: `mailto:${profile.email}`,
   address: { '@type': 'PostalAddress', addressLocality: 'Bangkok', addressCountry: 'TH' },
   url: new URL(withBase('/'), Astro.site).href,
@@ -29,7 +32,7 @@ const personLd = {
 };
 ---
 <!doctype html>
-<html lang="en">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -58,10 +61,10 @@ const personLd = {
     <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
   </head>
   <body class="bg-bg text-text">
-    <a href="#main" class="skip-link fixed left-4 top-4 z-[60] -translate-y-24 rounded bg-blue px-3 py-2 font-mono text-sm text-bg focus:translate-y-0">Skip to content</a>
-    <Nav />
+    <a href="#main" class="skip-link fixed left-4 top-4 z-[60] -translate-y-24 rounded bg-blue px-3 py-2 font-mono text-sm text-bg focus:translate-y-0">{t(lang, 'skip')}</a>
+    <Nav lang={lang} />
     <main id="main" tabindex="-1" class="outline-none"><slot /></main>
-    <Footer />
+    <Footer lang={lang} />
     <script>import '../scripts/motion';</script>
   </body>
 </html>

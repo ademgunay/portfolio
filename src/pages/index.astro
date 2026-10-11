@@ -11,12 +11,12 @@ import { getPublishedPosts } from '../lib/posts';
 
 const posts = await getPublishedPosts();
 ---
-<Base>
-  <Hero />
-  <AppShowcase />
-  <ExperienceTimeline />
-  <Skills />
-  <About />
-  <Writing posts={posts} limit={3} />
-  <Contact />
+<Base lang="en">
+  <Hero lang="en" />
+  <AppShowcase lang="en" />
+  <ExperienceTimeline lang="en" />
+  <Skills lang="en" />
+  <About lang="en" />
+  <Writing posts={posts} limit={3} lang="en" />
+  <Contact lang="en" />
 </Base>

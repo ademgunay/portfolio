@@ -113,7 +113,10 @@ export function t(lang: Lang, key: UiKey, vars: Record<string, string | number> 
 
 export function formatMonth(lang: Lang, ym: string): string {
   const [y, m] = ym.split('-').map(Number);
-  return new Intl.DateTimeFormat(t(lang, 'locale.date'), { month: 'short', year: 'numeric', timeZone: 'UTC' }).format(
-    new Date(Date.UTC(y, m - 1, 1)),
+  return (
+    new Intl.DateTimeFormat(t(lang, 'locale.date'), { month: 'short', year: 'numeric', timeZone: 'UTC' })
+      .format(new Date(Date.UTC(y, m - 1, 1)))
+      // Newer ICU renders en-GB September as "Sept"; keep the original 3-letter "Sep".
+      .replace(/^Sept\b/, 'Sep')
   );
 }
