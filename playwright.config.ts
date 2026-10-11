@@ -9,7 +9,8 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   use: { baseURL: 'http://localhost:4321', permissions: ['clipboard-read', 'clipboard-write'] },
   webServer: {
-    command: 'npm run build && npm run preview',
+    // CI builds once in the test job before this runs; locally build then preview.
+    command: process.env.CI ? 'npm run preview' : 'npm run build && npm run preview',
     url: `http://localhost:4321${base}`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
