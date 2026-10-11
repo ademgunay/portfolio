@@ -12,7 +12,7 @@ const NAV_OFFSET = 80; // keep in sync with `scroll-padding-top: 5rem` in global
 
 function initLenis(): Lenis | null {
   if (prefersReduced || isTouch) return null;
-  const lenis = new Lenis();
+  const lenis = new Lenis({ smoothWheel: false }); // native wheel/trackpad (no added latency); scrollTo stays eased
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((t) => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
@@ -67,6 +67,43 @@ function initHeroCycle() {
   }, 3200);
 }
 
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+const docTop = (el: HTMLElement) => {
+  let top = 0;
+  for (let n: HTMLElement | null = el; n; n = n.offsetParent as HTMLElement | null) top += n.offsetTop; // ignores transforms
+  return top;
+};
+
+/** Proximity snap: after wheel input settles, ease to the nearest item if within 30% of a viewport of it. */
+function createShowcaseSnap(lenis: Lenis, items: HTMLElement[]) {
+  let stopped = false;
+  let timer: number | undefined;
+  const settle = () => {
+    timer = undefined;
+    if (stopped) return;
+    const y = lenis.scroll; // current position: native wheel already applied
+    let target = NaN;
+    for (const el of items) {
+      const t = Math.ceil(docTop(el));
+      if (isNaN(target) || Math.abs(t - y) < Math.abs(target - y)) target = t;
+    }
+    const d = Math.abs(target - y);
+    if (d > 1 && d <= 0.3 * innerHeight) lenis.scrollTo(target, { duration: 0.45, easing: easeOutCubic });
+  };
+  const onInput = ({ event }: { event: Event }) => {
+    clearTimeout(timer);
+    if (event.type.includes('touch')) return;
+    timer = window.setTimeout(settle, 100);
+  };
+  lenis.on('virtual-scroll', onInput);
+  return {
+    stop: () => { stopped = true; clearTimeout(timer); },
+    start: () => { stopped = false; },
+    destroy: () => { lenis.off('virtual-scroll', onInput); clearTimeout(timer); },
+  };
+}
+
 function initShowcase(lenis: Lenis | null) {
   const section = document.querySelector<HTMLElement>('[data-showcase]');
   if (!section) return;
@@ -97,16 +134,19 @@ function initShowcase(lenis: Lenis | null) {
       trigger: section, start: 'top center', end: 'bottom center',
       onToggle: (self) => section.classList.toggle('showcase--in-view', self.isActive),
     });
+    const snap = lenis ? createShowcaseSnap(lenis, items) : null;
     const onRail = (e: Event) => {
       const i = Number((e.currentTarget as HTMLElement).dataset.railIndex);
       const target = items[i];
       programmatic = true;
+      snap?.stop();
       setActive(i);
       let done = false;
       const finish = () => {
         if (done) return;
         done = true;
         programmatic = false;
+        snap?.start();
         setActive(i);
       };
       if (lenis) lenis.scrollTo(target, { offset: 0, onComplete: finish });
@@ -121,6 +161,7 @@ function initShowcase(lenis: Lenis | null) {
     return () => {
       triggers.forEach((t) => t.kill());
       inView.kill();
+      snap?.destroy();
       rail.forEach((b) => b.removeEventListener('click', onRail));
       section.classList.remove('showcase--enhanced', 'showcase--in-view');
       programmatic = false;
