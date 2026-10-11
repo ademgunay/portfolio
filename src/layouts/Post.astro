@@ -1,0 +1,20 @@
+---
+import Base from './Base.astro';
+import { withBase } from '../lib/url';
+
+interface Props { title: string; description: string; date: Date; tags: string[]; minutes: number }
+const { title, description, date, tags, minutes } = Astro.props;
+---
+<Base title={`${title} — Adem Gunay`} description={description} type="article">
+  <article class="mx-auto max-w-3xl px-4 pb-24 pt-32 md:px-8">
+    <a href={withBase('/blog/')} class="font-mono text-sm text-muted hover:text-text">← All writing</a>
+    <h1 class="mt-6 text-4xl font-bold leading-tight md:text-5xl">{title}</h1>
+    <p class="mt-4 font-mono text-sm text-muted">
+      <time datetime={date.toISOString()}>{date.toLocaleDateString('en-GB', { dateStyle: 'long', timeZone: 'UTC' })}</time> · {minutes} min read
+      {tags.length > 0 && <> · {tags.map((t) => `#${t}`).join(' ')}</>}
+    </p>
+    <div class="post-body mt-10 space-y-6 text-lg leading-relaxed text-muted [&_a]:text-blue [&_code]:font-mono [&_h2]:mt-12 [&_h2]:text-2xl [&_h2]:font-bold [&_h2]:text-text [&_pre]:overflow-x-auto [&_pre]:rounded-xl [&_pre]:border [&_pre]:border-border [&_pre]:p-5 [&_pre]:text-sm">
+      <slot />
+    </div>
+  </article>
+</Base>

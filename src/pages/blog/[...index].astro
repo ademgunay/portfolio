@@ -1,0 +1,14 @@
+---
+import Base from '../../layouts/Base.astro';
+import Writing from '../../components/Writing.astro';
+import { getPublishedPosts } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  return posts.length > 0 ? [{ params: { index: undefined }, props: { posts } }] : [];
+}
+const { posts } = Astro.props;
+---
+<Base title="Writing — Adem Gunay" description="Articles and notes on Android, Kotlin and Flutter by Adem Gunay.">
+  <div class="pt-16"><Writing posts={posts} heading={false} /></div>
+</Base>

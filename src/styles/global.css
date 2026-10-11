@@ -1,0 +1,39 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-bg: #0d1117;
+  --color-surface: #161b22;
+  --color-border: #30363d;
+  --color-text: #e6edf3;
+  --color-muted: #8b949e;
+  --color-blue: #58a6ff;
+  --color-green: #7ee787;
+  --color-purple: #8957e5;
+  --font-sans: 'Space Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  html { background: var(--color-bg); color: var(--color-text); font-family: var(--font-sans); scroll-padding-top: 5rem; }
+  body { min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  ::selection { background: color-mix(in srgb, var(--color-blue) 35%, transparent); }
+  :focus-visible { outline: 2px solid var(--color-blue); outline-offset: 3px; border-radius: 4px; }
+}
+
+/* Pre-hide animated content (class set by an inline <head> script, so no paint-then-vanish flash) */
+.motion-ready [data-reveal] { opacity: 0; }
+.motion-ready [data-typing] { visibility: hidden; }
+
+/* Lenis recommended styles */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* Showcase: enhanced (desktop + motion) layout */
+.showcase--enhanced [data-showcase-body] { display: grid; grid-template-columns: 320px 1fr; gap: 4rem; }
+.showcase--enhanced [data-showcase-stage] { display: block; }
+.showcase--enhanced [data-card-phone] { display: none; }
+.showcase--enhanced [data-showcase-list] > li { grid-template-columns: 1fr; min-height: 100vh; align-content: center; }
+.showcase--enhanced [data-showcase-rail] { display: block; position: fixed; right: 2rem; top: 50%; transform: translateY(-50%); z-index: 40; transition: opacity 0.3s ease, visibility 0s; }
+.showcase--enhanced:not(.showcase--in-view) [data-showcase-rail] { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }
+@media (max-width: 1399px) { .showcase--enhanced [data-showcase-body] { padding-right: 9rem; } } /* gutter for the fixed rail */

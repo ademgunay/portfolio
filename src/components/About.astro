@@ -1,0 +1,19 @@
+---
+import { Image } from 'astro:assets';
+import { profile } from '../content/profile';
+import SectionHeading from './SectionHeading.astro';
+---
+<section aria-labelledby="about" class="mx-auto max-w-4xl px-4 py-24 md:px-8">
+  <SectionHeading index="04" title="About" id="about" />
+  <div class:list={['grid gap-10', profile.photo && 'md:grid-cols-[1fr_220px]']} data-reveal>
+    <div class="space-y-5 text-lg leading-relaxed text-muted">
+      {profile.bio.map((p) => <p>{p}</p>)}
+      <ul class="flex flex-wrap gap-2 pt-2" aria-label="Languages">
+        {profile.languages.map((l) => (
+          <li class="rounded-full border border-border px-3 py-1 font-mono text-xs text-text">{l.name} <span class="text-muted">· {l.level}</span></li>
+        ))}
+      </ul>
+    </div>
+    {profile.photo && <Image src={profile.photo} alt={profile.name} width={220} class="rounded-2xl border border-border" />}
+  </div>
+</section>

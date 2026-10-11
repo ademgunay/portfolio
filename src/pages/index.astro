@@ -1,0 +1,22 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import AppShowcase from '../components/AppShowcase.astro';
+import ExperienceTimeline from '../components/ExperienceTimeline.astro';
+import Skills from '../components/Skills.astro';
+import About from '../components/About.astro';
+import Writing from '../components/Writing.astro';
+import Contact from '../components/Contact.astro';
+import { getPublishedPosts } from '../lib/posts';
+
+const posts = await getPublishedPosts();
+---
+<Base>
+  <Hero />
+  <AppShowcase />
+  <ExperienceTimeline />
+  <Skills />
+  <About />
+  <Writing posts={posts} limit={3} />
+  <Contact />
+</Base>
