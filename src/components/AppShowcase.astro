@@ -10,11 +10,11 @@ const apps = (await getCollection('apps')).sort((a, b) => a.data.order - b.data.
   <SectionHeading index="01" title="Apps I've built" id="apps" />
   <div class="relative" data-showcase-body>
     <div aria-hidden="true" class="hidden" data-showcase-stage>
-      <div class="sticky top-[calc(50vh-300px)] h-[600px]">
+      <div class="sticky h-[var(--stage-h)] top-[calc(64px+(100svh-64px-var(--stage-h))/2)] [--stage-h:min(600px,calc(100svh-64px-2rem))]">
         {apps.map((app, i) => (
           <div class="absolute inset-0 transition-[opacity,transform] duration-500 will-change-[opacity,transform]" data-stage-phone={i} style={i === 0 ? '' : 'opacity:0;transform:translateY(24px)'}>
             <div aria-hidden="true" class="pointer-events-none absolute -inset-[40%]" style={`background:radial-gradient(closest-side, ${app.data.accentColor}59, transparent 70%)`} data-stage-glow></div>
-            <div class="relative"><PhoneFrame images={[app.data.screenshots[0]]} alt={`${app.data.name} app screenshot`} /></div>
+            <div class="relative h-full"><PhoneFrame class="!h-full !w-auto !max-w-none" images={[app.data.screenshots[0]]} alt={`${app.data.name} app screenshot`} /></div>
           </div>
         ))}
       </div>

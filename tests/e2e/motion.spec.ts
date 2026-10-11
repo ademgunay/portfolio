@@ -22,6 +22,26 @@ test('desktop with motion: showcase is enhanced, rail navigates, stage phone fol
   await expect(page.locator('[data-stage-phone="3"]')).toHaveCSS('opacity', '1');
 });
 
+test('stage phone stays clear of the nav on a 1366x657 laptop', async ({ page }, info) => {
+  test.skip(isMobile(info.project.name));
+  await page.setViewportSize({ width: 1366, height: 657 });
+  await gotoHome(page);
+  await expect(page.locator('[data-showcase]')).toHaveClass(/showcase--enhanced/);
+  await page.evaluate(() => {
+    const body = document.querySelector('[data-showcase-body]')!.getBoundingClientRect();
+    scrollTo(0, scrollY + body.top + body.height / 2 - innerHeight / 2);
+  });
+  await expect(page.locator('[data-showcase]')).toHaveClass(/showcase--in-view/);
+  await page.waitForTimeout(600);
+  const box = await page.locator('[data-stage-phone] [data-phone]').evaluateAll((els) => {
+    const visible = els.map((e) => e.closest('[data-stage-phone]') as HTMLElement).find((p) => p.style.opacity === '1');
+    const r = visible!.querySelector('[data-phone]')!.getBoundingClientRect();
+    return { top: r.top, bottom: r.bottom, vh: innerHeight };
+  });
+  expect(box.top).toBeGreaterThanOrEqual(64);
+  expect(box.bottom).toBeLessThanOrEqual(box.vh);
+});
+
 test('desktop resized below 1024px reverts to stacked cards (Review Focus #2)', async ({ page }, info) => {
   test.skip(isMobile(info.project.name));
   await gotoHome(page);
