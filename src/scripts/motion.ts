@@ -1,7 +1,6 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-import Snap from 'lenis/snap';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -68,6 +67,43 @@ function initHeroCycle() {
   }, 3200);
 }
 
+const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+
+const docTop = (el: HTMLElement) => {
+  let top = 0;
+  for (let n: HTMLElement | null = el; n; n = n.offsetParent as HTMLElement | null) top += n.offsetTop; // ignores transforms
+  return top;
+};
+
+/** Proximity snap: after wheel input settles, ease to the nearest item if within 30% of a viewport of it. */
+function createShowcaseSnap(lenis: Lenis, items: HTMLElement[]) {
+  let stopped = false;
+  let timer: number | undefined;
+  const settle = () => {
+    timer = undefined;
+    if (stopped) return;
+    const y = lenis.scroll; // current position: native wheel already applied
+    let target = NaN;
+    for (const el of items) {
+      const t = Math.ceil(docTop(el));
+      if (isNaN(target) || Math.abs(t - y) < Math.abs(target - y)) target = t;
+    }
+    const d = Math.abs(target - y);
+    if (d > 1 && d <= 0.3 * innerHeight) lenis.scrollTo(target, { duration: 0.45, easing: easeOutCubic });
+  };
+  const onInput = ({ event }: { event: Event }) => {
+    clearTimeout(timer);
+    if (event.type.includes('touch')) return;
+    timer = window.setTimeout(settle, 100);
+  };
+  lenis.on('virtual-scroll', onInput);
+  return {
+    stop: () => { stopped = true; clearTimeout(timer); },
+    start: () => { stopped = false; },
+    destroy: () => { lenis.off('virtual-scroll', onInput); clearTimeout(timer); },
+  };
+}
+
 function initShowcase(lenis: Lenis | null) {
   const section = document.querySelector<HTMLElement>('[data-showcase]');
   if (!section) return;
@@ -98,18 +134,7 @@ function initShowcase(lenis: Lenis | null) {
       trigger: section, start: 'top center', end: 'bottom center',
       onToggle: (self) => section.classList.toggle('showcase--in-view', self.isActive),
     });
-    // Proximity snap: easing to the nearest app only when released within 30% of a viewport of it.
-    // Lenis exists only on non-touch / no-reduced-motion, so this is already desktop-only.
-    const snap = lenis
-      ? new Snap(lenis, {
-          type: 'proximity',
-          distanceThreshold: '30%',
-          duration: 0.45,
-          easing: (t) => 1 - Math.pow(1 - t, 3),
-          debounce: 100,
-        })
-      : null;
-    snap?.addElements(items, { align: ['start'], ignoreTransform: true });
+    const snap = lenis ? createShowcaseSnap(lenis, items) : null;
     const onRail = (e: Event) => {
       const i = Number((e.currentTarget as HTMLElement).dataset.railIndex);
       const target = items[i];

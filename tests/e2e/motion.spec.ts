@@ -196,6 +196,15 @@ test.describe('showcase snap scrolling', () => {
     expect(Math.abs(y - (await snapY(page, 1)))).toBeLessThanOrEqual(2);
   });
 
+  test('decision uses the real position: a final 100px wheel step ending 240px past an app snaps back', async ({ page }) => {
+    await page.waitForLoadState('load');
+    const s2 = await snapY(page, 2);
+    await scrollNow(page, s2 + 140);
+    await settle(page, 300);
+    await page.mouse.wheel(0, 100); // lands ~240px past the app: inside 30% of 900, but 340px if the delta were counted twice
+    await expect.poll(async () => Math.abs((await snapY(page, 2)) - (await page.evaluate(() => scrollY))), { timeout: 5000 }).toBeLessThanOrEqual(2);
+  });
+
   test('released between two apps (beyond 30% of both), it stays put', async ({ page }) => {
     const s1 = await snapY(page, 1);
     const s2 = await snapY(page, 2);
