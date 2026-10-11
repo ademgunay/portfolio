@@ -253,6 +253,25 @@ test.describe('reduced motion snap', () => {
   });
 });
 
+test('page stops moving when wheel input stops (no smoothing lag)', async ({ page }, info) => {
+  test.skip(isMobile(info.project.name));
+  await gotoHome(page);
+  await expect(page.locator('[data-showcase]')).toHaveClass(/showcase--enhanced/);
+  await page.mouse.move(700, 450);
+  const exp = await page.evaluate(() => document.querySelector('#experience')!.getBoundingClientRect().top + scrollY);
+  await scrollNow(page, exp - 1500);
+  await settle(page, 300);
+  for (let i = 0; i < 6; i++) {
+    await page.mouse.wheel(0, 200);
+    await page.waitForTimeout(16);
+  }
+  await page.waitForTimeout(50);
+  const early = await page.evaluate(() => scrollY);
+  await page.waitForTimeout(500);
+  const late = await page.evaluate(() => scrollY);
+  expect(late - early).toBeLessThanOrEqual(5);
+});
+
 test('mobile: stacked cards, no enhancement', async ({ page }, info) => {
   test.skip(!isMobile(info.project.name));
   await gotoHome(page);

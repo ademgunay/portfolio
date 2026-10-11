@@ -13,7 +13,7 @@ const NAV_OFFSET = 80; // keep in sync with `scroll-padding-top: 5rem` in global
 
 function initLenis(): Lenis | null {
   if (prefersReduced || isTouch) return null;
-  const lenis = new Lenis();
+  const lenis = new Lenis({ smoothWheel: false }); // native wheel/trackpad (no added latency); scrollTo stays eased
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((t) => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
@@ -104,12 +104,12 @@ function initShowcase(lenis: Lenis | null) {
       ? new Snap(lenis, {
           type: 'proximity',
           distanceThreshold: '30%',
-          duration: 0.6,
+          duration: 0.45,
           easing: (t) => 1 - Math.pow(1 - t, 3),
-          debounce: 150,
+          debounce: 100,
         })
       : null;
-    snap?.addElements(items, { align: ['start'] });
+    snap?.addElements(items, { align: ['start'], ignoreTransform: true });
     const onRail = (e: Event) => {
       const i = Number((e.currentTarget as HTMLElement).dataset.railIndex);
       const target = items[i];
