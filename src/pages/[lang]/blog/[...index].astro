@@ -1,0 +1,15 @@
+---
+import WritingPage from '../../../components/pages/WritingPage.astro';
+import { getPublishedPosts } from '../../../lib/posts';
+import { nonDefaultLangs } from '../../../i18n/paths';
+import type { Lang } from '../../../i18n/ui';
+
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts();
+  if (posts.length === 0) return [];
+  return nonDefaultLangs().map((lang) => ({ params: { lang, index: undefined }, props: { posts } }));
+}
+const lang = Astro.params.lang as Lang;
+const { posts } = Astro.props;
+---
+<WritingPage lang={lang} posts={posts} />

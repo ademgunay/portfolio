@@ -1,6 +1,10 @@
 ---
 import { experience } from '../content/experience';
 import SectionHeading from './SectionHeading.astro';
+import { formatMonth, pick, t, type Lang } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
 ---
 <section aria-labelledby="experience" class="mx-auto max-w-4xl px-4 py-24 md:px-8">
   <SectionHeading index="02" title="git log --experience" id="experience" />
@@ -8,14 +12,14 @@ import SectionHeading from './SectionHeading.astro';
     {experience.map((job) => (
       <li class="relative pb-12 last:pb-0" data-job={job.company} data-reveal>
         <span aria-hidden="true" class="absolute -left-[39px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-green bg-bg"></span>
-        <h3 class="text-2xl font-bold"><span data-company>{job.company}</span> <span class="font-mono text-sm font-normal text-muted">· {job.location}</span></h3>
+        <h3 class="text-2xl font-bold"><span data-company>{job.company}</span> <span class="font-mono text-sm font-normal text-muted">· {pick(job.location, lang)}</span></h3>
         <ul class="mt-2 space-y-1">
           {job.roles.map((r) => (
-            <li class="font-mono text-sm" data-role><span class="text-blue">{r.title}</span> <span class="text-muted">{r.start} — {r.end}</span></li>
+            <li class="font-mono text-sm" data-role><span class="text-blue">{pick(r.title, lang)}</span> <span class="text-muted">{formatMonth(lang, r.start)} — {r.end ? formatMonth(lang, r.end) : t(lang, 'experience.present')}</span></li>
           ))}
         </ul>
         <ul class="mt-4 list-disc space-y-2 pl-5 text-muted marker:text-border">
-          {job.highlights.slice(0, 3).map((h) => <li>{h}</li>)}
+          {pick(job.highlights, lang).slice(0, 3).map((h) => <li>{h}</li>)}
         </ul>
       </li>
     ))}

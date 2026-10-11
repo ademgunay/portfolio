@@ -1,6 +1,5 @@
 ---
-import Base from '../../layouts/Base.astro';
-import Writing from '../../components/Writing.astro';
+import WritingPage from '../../components/pages/WritingPage.astro';
 import { getPublishedPosts } from '../../lib/posts';
 
 export async function getStaticPaths() {
@@ -9,6 +8,4 @@ export async function getStaticPaths() {
 }
 const { posts } = Astro.props;
 ---
-<Base title="Writing — Adem Gunay" description="Articles and notes on Android, Kotlin and Flutter by Adem Gunay.">
-  <div class="pt-16"><Writing posts={posts} heading={false} /></div>
-</Base>
+<WritingPage lang="en" posts={posts} />

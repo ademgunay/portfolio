@@ -1,6 +1,10 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { LANGS } from '../site.config.mjs';
+
+const localizedString = () =>
+  z.object(Object.fromEntries(LANGS.map((l) => [l, z.string().min(1)])) as Record<(typeof LANGS)[number], z.ZodString>);
 
 const apps = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/apps' }),
@@ -8,8 +12,9 @@ const apps = defineCollection({
     z.object({
       name: z.string(),
       company: z.string(),
-      period: z.string(),
-      role: z.string(),
+      period: localizedString(),
+      role: localizedString(),
+      story: localizedString(),
       stack: z.array(z.string()).min(1),
       storeLinks: z
         .object({ playStore: z.url().optional(), appStore: z.url().optional(), web: z.url().optional() })

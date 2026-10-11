@@ -1,12 +1,11 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { render } from 'astro:content';
 import PhoneFrame from './PhoneFrame.astro';
 import StoreBadges from './StoreBadges.astro';
+import { pick, t, type Lang } from '../i18n/ui';
 
-interface Props { app: CollectionEntry<'apps'>; index: number; total: number }
-const { app, index, total } = Astro.props;
-const { Content } = await render(app);
+interface Props { app: CollectionEntry<'apps'>; index: number; total: number; lang: Lang }
+const { app, index, total, lang } = Astro.props;
 const d = app.data;
 const pad = (n: number) => String(n).padStart(2, '0');
 ---
@@ -15,17 +14,17 @@ const pad = (n: number) => String(n).padStart(2, '0');
   data-app={app.id} data-index={index} data-accent={d.accentColor} data-status={d.status} data-reveal
 >
   <div data-card-phone>
-    <PhoneFrame images={[d.screenshots[0]]} alt={`${d.name} app screenshot`} />
+    <PhoneFrame images={[d.screenshots[0]]} alt={t(lang, 'apps.screenshotAlt', { name: d.name })} />
   </div>
   <div class="app-text">
     <p class="font-mono text-sm text-muted">{pad(index + 1)} / {pad(total)}</p>
     <h3 class="mt-2 text-3xl font-bold md:text-4xl">{d.name}</h3>
-    <p class="mt-2 font-mono text-sm text-muted">{d.company} · {d.period}</p>
-    <p class="mt-4 text-lg text-blue">{d.role}</p>
-    <div class="prose-invert mt-4 max-w-xl text-muted [&_p]:leading-relaxed"><Content /></div>
+    <p class="mt-2 font-mono text-sm text-muted">{d.company} · {pick(d.period, lang)}</p>
+    <p class="mt-4 text-lg text-blue">{pick(d.role, lang)}</p>
+    <div class="prose-invert mt-4 max-w-xl text-muted [&_p]:leading-relaxed"><p>{pick(d.story, lang)}</p></div>
     <ul class="mt-6 flex flex-wrap gap-2" data-stack>
       {d.stack.map((s) => <li class="rounded-full border border-border px-3 py-1 font-mono text-xs">{s}</li>)}
     </ul>
-    <StoreBadges links={d.storeLinks} status={d.status} name={d.name} />
+    <StoreBadges links={d.storeLinks} status={d.status} name={d.name} lang={lang} />
   </div>
 </li>

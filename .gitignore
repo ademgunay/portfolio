@@ -6,4 +6,6 @@ dist/
 test-results/
 playwright-report/
 .lighthouseci/
+.vitest/
+localhost-*.report.*
 docs/superpowers/

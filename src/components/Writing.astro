@@ -2,16 +2,18 @@
 import type { CollectionEntry } from 'astro:content';
 import { isExternal } from '../lib/posts-core';
 import { withBase } from '../lib/url';
+import { localePath } from '../i18n/paths';
+import { DEFAULT_LANG, t, type Lang } from '../i18n/ui';
 import SectionHeading from './SectionHeading.astro';
 
-interface Props { posts: CollectionEntry<'blog'>[]; limit?: number; heading?: boolean }
-const { posts, limit, heading = true } = Astro.props;
+interface Props { posts: CollectionEntry<'blog'>[]; limit?: number; heading?: boolean; lang: Lang }
+const { posts, limit, heading = true, lang } = Astro.props;
 const shown = limit ? posts.slice(0, limit) : posts;
-const fmt = (d: Date) => d.toLocaleDateString('en-GB', { year: 'numeric', month: 'short', timeZone: 'UTC' });
+const fmt = (d: Date) => d.toLocaleDateString(t(lang, 'locale.date'), { year: 'numeric', month: 'short', timeZone: 'UTC' });
 ---
 {shown.length > 0 && (
   <section aria-labelledby="writing" class="mx-auto max-w-4xl px-4 py-24 md:px-8">
-    {heading ? <SectionHeading index="05" title="Writing" id="writing" /> : <h1 id="writing" class="mb-10 text-4xl font-bold">Writing</h1>}
+    {heading ? <SectionHeading index="05" title={t(lang, 'writing.title')} id="writing" /> : <h1 id="writing" class="mb-10 text-4xl font-bold">{t(lang, 'writing.title')}</h1>}
     <ul class="divide-y divide-border border-y border-border">
       {shown.map((p) => {
         const ext = isExternal(p);
@@ -21,15 +23,20 @@ const fmt = (d: Date) => d.toLocaleDateString('en-GB', { year: 'numeric', month:
             <a href={href} {...(ext ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               class="group flex flex-col gap-1 py-5 md:flex-row md:items-baseline md:gap-6">
               <time datetime={p.data.date.toISOString()} class="w-24 shrink-0 font-mono text-sm text-muted">{fmt(p.data.date)}</time>
-              <span class="flex-1 text-lg group-hover:text-blue">{p.data.title}</span>
-              {ext && <span class="font-mono text-xs text-muted">↗ {p.data.publisher ?? 'External'}</span>}
+              <span class="flex-1 text-lg group-hover:text-blue" {...(lang !== DEFAULT_LANG ? { lang: DEFAULT_LANG } : {})}>{p.data.title}</span>
+              {(ext || lang !== DEFAULT_LANG) && (
+                <span class="font-mono text-xs text-muted">
+                  {ext && <>↗ {p.data.publisher ?? t(lang, 'writing.external')}</>}
+                  {lang !== DEFAULT_LANG && <>{ext && ' '}<span class="rounded border border-border px-1" lang={DEFAULT_LANG} aria-hidden="true">EN</span><span class="sr-only"> ({t(lang, 'writing.inEnglish')})</span></>}
+                </span>
+              )}
             </a>
           </li>
         );
       })}
     </ul>
     {limit && posts.length > 0 && (
-      <p class="mt-6 text-right"><a href={withBase('/blog/')} class="font-mono text-sm text-blue hover:underline">All writing →</a></p>
+      <p class="mt-6 text-right"><a href={localePath(lang, '/blog/')} class="font-mono text-sm text-blue hover:underline">{t(lang, 'writing.all')}</a></p>
     )}
   </section>
 )}

@@ -1,0 +1,42 @@
+---
+import { LANGS, t, type Lang } from '../i18n/ui';
+import { switchLocalePath } from '../i18n/paths';
+
+interface Props { lang: Lang; class?: string }
+const { lang, class: cls = '' } = Astro.props;
+const here = Astro.url.pathname;
+---
+<div role="group" aria-label={t(lang, 'lang.toggleAria')} class:list={['flex items-center rounded-md border border-border font-mono text-xs', cls]} data-lang-toggle>
+  {LANGS.map((l) =>
+    l === lang ? (
+      <span aria-current="true" class="px-2 py-2.5 text-text">{t(l, 'lang.short')}</span>
+    ) : (
+      <a href={switchLocalePath(here, l)} data-href={switchLocalePath(here, l)} hreflang={l} lang={l}
+        class="px-2 py-2.5 text-muted transition-colors hover:text-text">{t(l, 'lang.short').toLowerCase()}<span class="sr-only"> — {t(l, 'lang.switchLabel')}</span></a>
+    ),
+  )}
+</div>
+<script>
+  // Keep the current section when switching language (no JS → lands at the top of the other page).
+  // The target is recomputed from the scroll position on every activation, never from the URL hash.
+  const NAV_OFFSET = 80;
+  const currentSection = () => {
+    let id = '';
+    const sections = [...document.querySelectorAll<HTMLElement>('main section[aria-labelledby]')];
+    sections.forEach((s) => {
+      if (s.getBoundingClientRect().top <= NAV_OFFSET) id = s.getAttribute('aria-labelledby') ?? '';
+    });
+    // At the very bottom a short last section can never reach the top: it is the one being read.
+    const atBottom = scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
+    if (atBottom && scrollY > 0 && sections.length) id = sections[sections.length - 1].getAttribute('aria-labelledby') ?? id;
+    return id;
+  };
+  const sync = (a: HTMLAnchorElement) => {
+    const id = currentSection();
+    a.href = (a.dataset.href ?? a.getAttribute('href') ?? '') + (id ? `#${id}` : '');
+  };
+  document.querySelectorAll<HTMLAnchorElement>('[data-lang-toggle] a').forEach((a) => {
+    // pointerdown/keydown run before navigation; click/auxclick cover everything else.
+    for (const type of ['pointerdown', 'click', 'auxclick', 'keydown', 'focus']) a.addEventListener(type, () => sync(a));
+  });
+</script>

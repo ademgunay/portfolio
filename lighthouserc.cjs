@@ -8,7 +8,7 @@ module.exports = {
     collect: {
       startServerCommand: 'npm run preview',
       startServerReadyPattern: 'localhost:4321',
-      url: [`${origin}${base}`, `${origin}${base}blog/`],
+      url: [`${origin}${base}`, `${origin}${base}blog/`, `${origin}${base}fr/`],
       numberOfRuns: 3,
     },
     assert: {
@@ -21,6 +21,6 @@ module.exports = {
         'total-blocking-time': ['error', { maxNumericValue: 200 }],
       },
     },
-    upload: { target: 'temporary-public-storage' },
+    upload: { target: 'temporary-public-storage', outputDir: '.lighthouseci' },
   },
 };

@@ -1,7 +1,11 @@
 ---
 import { profile } from '../content/profile';
+import { t, type Lang } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
 const year = new Date().getFullYear();
 ---
 <footer class="border-t border-border py-8 text-center font-mono text-xs text-muted">
-  © {year} {profile.name} · Built with Astro
+  {t(lang, 'footer.text', { year, name: profile.name })}
 </footer>

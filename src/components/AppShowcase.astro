@@ -3,27 +3,31 @@ import { getCollection } from 'astro:content';
 import AppCard from './AppCard.astro';
 import PhoneFrame from './PhoneFrame.astro';
 import SectionHeading from './SectionHeading.astro';
+import { t, type Lang } from '../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
 
 const apps = (await getCollection('apps')).sort((a, b) => a.data.order - b.data.order);
 ---
 <section aria-labelledby="apps" class="relative mx-auto max-w-6xl px-4 py-24 md:px-8" data-showcase>
-  <SectionHeading index="01" title="Apps I've built" id="apps" />
+  <SectionHeading index="01" title={t(lang, 'apps.title')} id="apps" />
   <div class="relative" data-showcase-body>
     <div aria-hidden="true" class="hidden" data-showcase-stage>
       <div class="sticky h-[var(--stage-h)] top-[calc(64px+(100svh-64px-var(--stage-h))/2)] [--stage-h:min(600px,calc(100svh-64px-2rem))]">
         {apps.map((app, i) => (
           <div class="absolute inset-0 transition-[opacity,transform] duration-500 will-change-[opacity,transform]" data-stage-phone={i} style={i === 0 ? '' : 'opacity:0;transform:translateY(24px)'}>
             <div aria-hidden="true" class="pointer-events-none absolute -inset-[40%]" style={`background:radial-gradient(closest-side, ${app.data.accentColor}59, transparent 70%)`} data-stage-glow></div>
-            <div class="relative h-full"><PhoneFrame class="!h-full !w-auto !max-w-none" images={[app.data.screenshots[0]]} alt={`${app.data.name} app screenshot`} /></div>
+            <div class="relative h-full"><PhoneFrame class="!h-full !w-auto !max-w-none" images={[app.data.screenshots[0]]} alt={t(lang, 'apps.screenshotAlt', { name: app.data.name })} /></div>
           </div>
         ))}
       </div>
     </div>
     <ol data-showcase-list>
-      {apps.map((app, i) => <AppCard app={app} index={i} total={apps.length} />)}
+      {apps.map((app, i) => <AppCard app={app} index={i} total={apps.length} lang={lang} />)}
     </ol>
   </div>
-  <nav aria-label="Apps" class="hidden" data-showcase-rail>
+  <nav aria-label={t(lang, 'apps.railAria')} class="hidden" data-showcase-rail>
     <ul class="flex flex-col gap-3 font-mono text-xs">
       {apps.map((app, i) => (
         <li><button type="button" data-rail-index={i} class="text-left text-muted transition-colors hover:text-text aria-[current=true]:text-text">{app.data.name}</button></li>

@@ -24,6 +24,21 @@ npm run e2e        # end-to-end tests (Playwright, builds first)
 
 New post: copy `src/content/blog/example-draft.md`, rename, set `draft: false`.
 
+## Languages
+
+English lives at `/portfolio/`, French at `/portfolio/fr/`. The nav toggle switches between them and keeps the current section.
+
+- Interface text: `src/i18n/ui.ts` (one block per language; a missing key fails the type check and unit tests).
+- Content: fields shaped `{ en: …, fr: … }` in `src/content/profile.ts`, `experience.ts`, `skills.ts`, and `role` / `period` / `story` in each `src/content/apps/*.md`.
+- French CV: set `cvPaths: { fr: '/cv-fr.pdf' }` in `profile.ts` (languages without an entry use `cvPath`) and add the file to `public/`.
+
+### Adding a language (e.g. German)
+1. `site.config.mjs`: `LANGS = ['en', 'fr', 'de']`.
+2. `src/i18n/ui.ts`: add a `de` block and include it in the exported `ui` map (the type check lists every missing key).
+3. Add `de` values to every `{ en, fr }` field and app frontmatter (the build fails until all exist).
+4. Run `npx astro sync --force` (or delete `node_modules/.astro`): the content cache does not track `site.config.mjs`, so a stale cache can miss the new language.
+Pages (`/de/`, `/de/blog/`), hreflang tags and the toggle are generated automatically.
+
 ## CI
 
 The workflow lives in `.github/workflows/deploy.yml`.

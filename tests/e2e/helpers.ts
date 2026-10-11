@@ -5,8 +5,9 @@ import { BASE as SITE_BASE } from '../../site.config.mjs';
 /** Base path with a trailing slash ('/' or '/portfolio/'). */
 export const BASE = `${SITE_BASE.replace(/\/+$/, '')}/`;
 
-export async function gotoHome(page: Page) {
-  await page.goto(BASE);
+export const homePath = (lang: 'en' | 'fr' = 'en') => (lang === 'en' ? BASE : `${BASE}${lang}/`);
+export async function gotoHome(page: Page, lang: 'en' | 'fr' = 'en') {
+  await page.goto(homePath(lang));
 }
 
 /** Reach `selector` with real Tab presses, then assert it shows a visible focus ring. */

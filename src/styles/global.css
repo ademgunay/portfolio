@@ -9,8 +9,27 @@
   --color-blue: #58a6ff;
   --color-green: #7ee787;
   --color-purple: #8957e5;
-  --font-sans: 'Space Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  --font-sans: 'Space Grotesk Variable', 'Space Grotesk Fallback', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'JetBrains Mono Fallback', ui-monospace, SFMono-Regular, monospace;
+}
+
+/* Metric-matched fallbacks (capsize-style, from latin xWidthAvg/ascent/descent vs Arial / Courier New)
+   so the swap-in of the web fonts does not reflow text. */
+@font-face {
+  font-family: 'Space Grotesk Fallback';
+  src: local('Arial'), local('ArialMT'), local('Liberation Sans'), local('Helvetica'), local('Arimo');
+  size-adjust: 109.47%;
+  ascent-override: 89.89%;
+  descent-override: 26.67%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'JetBrains Mono Fallback';
+  src: local('Courier New'), local('CourierNewPSMT'), local('Liberation Mono'), local('Cousine');
+  size-adjust: 99.98%;
+  ascent-override: 102.02%;
+  descent-override: 30.00%;
+  line-gap-override: 0%;
 }
 
 @layer base {
