@@ -1,17 +1,11 @@
 ---
-import Base from '../../layouts/Base.astro';
-import Writing from '../../components/Writing.astro';
+import WritingPage from '../../components/pages/WritingPage.astro';
 import { getPublishedPosts } from '../../lib/posts';
-import { profile } from '../../content/profile';
-import { t } from '../../i18n/ui';
 
 export async function getStaticPaths() {
   const posts = await getPublishedPosts();
   return posts.length > 0 ? [{ params: { index: undefined }, props: { posts } }] : [];
 }
 const { posts } = Astro.props;
-const lang = 'en';
 ---
-<Base lang={lang} title={t(lang, 'meta.writingTitle', { name: profile.name })} description={t(lang, 'meta.writingDescription')}>
-  <div class="pt-16"><Writing posts={posts} heading={false} lang={lang} /></div>
-</Base>
+<WritingPage lang="en" posts={posts} />

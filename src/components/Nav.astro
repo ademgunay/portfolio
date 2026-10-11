@@ -4,6 +4,7 @@ import { getPublishedPosts } from '../lib/posts';
 import { withBase } from '../lib/url';
 import { localePath } from '../i18n/paths';
 import { t, type Lang } from '../i18n/ui';
+import LangToggle from './LangToggle.astro';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
@@ -23,15 +24,19 @@ const cv = withBase(lang === 'fr' && profile.cvPathFr ? profile.cvPathFr : profi
     <a href={localePath(lang, '/')} class="font-mono text-lg font-semibold text-text" aria-label={t(lang, 'nav.home', { name: profile.name })}>AG<span class="text-green">_</span></a>
     <ul class="hidden items-center gap-7 text-sm text-muted md:flex">
       {links.map((l) => <li><a class="transition-colors hover:text-text" href={l.href}>{l.label}</a></li>)}
+      <li><LangToggle lang={lang} /></li>
       <li><a href={cv} class="rounded-md border border-border px-3 py-1.5 font-mono text-text hover:border-blue" download>{t(lang, 'nav.cv')}</a></li>
     </ul>
-    <details class="md:hidden" data-mobile-menu>
+    <div class="flex items-center gap-3 md:hidden">
+    <LangToggle lang={lang} />
+    <details data-mobile-menu>
       <summary class="list-none cursor-pointer rounded-md border border-border px-3 py-1.5 font-mono text-sm" aria-label={t(lang, 'nav.menuAria')}>{t(lang, 'nav.menu')}</summary>
       <ul class="fixed inset-0 top-16 flex flex-col gap-6 bg-bg/95 p-8 text-2xl backdrop-blur">
         {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
         <li><a href={cv} download>{t(lang, 'cta.downloadCv')}</a></li>
       </ul>
     </details>
+    </div>
   </nav>
 </header>
 <script>

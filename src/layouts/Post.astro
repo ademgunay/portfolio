@@ -5,7 +5,7 @@ import { withBase } from '../lib/url';
 interface Props { title: string; description: string; date: Date; tags: string[]; minutes: number }
 const { title, description, date, tags, minutes } = Astro.props;
 ---
-<Base lang="en" title={`${title} — Adem Gunay`} description={description} type="article">
+<Base lang="en" translated={false} title={`${title} — Adem Gunay`} description={description} type="article">
   <article class="mx-auto max-w-3xl px-4 pb-24 pt-32 md:px-8">
     <a href={withBase('/blog/')} class="font-mono text-sm text-muted hover:text-text">← All writing</a>
     <h1 class="mt-6 text-4xl font-bold leading-tight md:text-5xl">{title}</h1>

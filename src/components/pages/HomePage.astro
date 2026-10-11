@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../Hero.astro';
+import AppShowcase from '../AppShowcase.astro';
+import ExperienceTimeline from '../ExperienceTimeline.astro';
+import Skills from '../Skills.astro';
+import About from '../About.astro';
+import Writing from '../Writing.astro';
+import Contact from '../Contact.astro';
+import { getPublishedPosts } from '../../lib/posts';
+import type { Lang } from '../../i18n/ui';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const posts = await getPublishedPosts();
+---
+<Base lang={lang}>
+  <Hero lang={lang} />
+  <AppShowcase lang={lang} />
+  <ExperienceTimeline lang={lang} />
+  <Skills lang={lang} />
+  <About lang={lang} />
+  <Writing posts={posts} limit={3} lang={lang} />
+  <Contact lang={lang} />
+</Base>

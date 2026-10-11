@@ -1,0 +1,13 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Writing from '../Writing.astro';
+import { profile } from '../../content/profile';
+import { t, type Lang } from '../../i18n/ui';
+
+interface Props { lang: Lang; posts: CollectionEntry<'blog'>[] }
+const { lang, posts } = Astro.props;
+---
+<Base lang={lang} title={t(lang, 'meta.writingTitle', { name: profile.name })} description={t(lang, 'meta.writingDescription')}>
+  <div class="pt-16"><Writing posts={posts} heading={false} lang={lang} /></div>
+</Base>

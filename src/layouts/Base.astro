@@ -7,17 +7,22 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { profile } from '../content/profile';
 import { withBase } from '../lib/url';
-import { pick, t, type Lang } from '../i18n/ui';
+import { LANGS, pick, t, type Lang } from '../i18n/ui';
+import { localePath, switchLocalePath } from '../i18n/paths';
 
-interface Props { lang: Lang; title?: string; description?: string; image?: string; type?: 'website' | 'article' }
+interface Props { lang: Lang; title?: string; description?: string; image?: string; type?: 'website' | 'article'; translated?: boolean }
 const {
   lang,
   title = `${profile.name} — ${pick(profile.title, lang)}`,
   description = pick(profile.summary, lang),
   image = withBase('/og-image.png'),
   type = 'website',
+  translated = true,
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
+const alternateLangs = translated ? LANGS : LANGS.filter((l) => l === 'en');
+const alternates = alternateLangs.map((l) => ({ lang: l, href: new URL(switchLocalePath(Astro.url.pathname, l), Astro.site).href }));
+const xDefault = alternates.find((a) => a.lang === 'en')!.href;
 const ogImage = new URL(image, Astro.site).href;
 const personLd = {
   '@context': 'https://schema.org',
@@ -27,7 +32,7 @@ const personLd = {
   description: pick(profile.summary, lang),
   email: `mailto:${profile.email}`,
   address: { '@type': 'PostalAddress', addressLocality: 'Bangkok', addressCountry: 'TH' },
-  url: new URL(withBase('/'), Astro.site).href,
+  url: new URL(localePath(lang, '/'), Astro.site).href,
   sameAs: [profile.links.linkedin, profile.links.github, profile.links.medium],
 };
 ---
@@ -47,6 +52,10 @@ const personLd = {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href} />)}
+    <link rel="alternate" hreflang="x-default" href={xDefault} />
+    <meta property="og:locale" content={t(lang, 'locale.og')} />
+    {LANGS.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={t(l, 'locale.og')} />)}
     <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
     <script is:inline>

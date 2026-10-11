@@ -17,6 +17,11 @@ describe('dictionary', () => {
   it('pick() returns the value for the locale', () => {
     expect(pick({ en: 'a', fr: 'b' }, 'fr')).toBe('b');
   });
+  it('formatMonth() normalizes September', () => {
+    expect(formatMonth('en', '2018-09')).toBe('Sep 2018');
+    expect(formatMonth('fr', '2018-09').toLowerCase().startsWith('sept')).toBe(true);
+  });
+
   it('formatMonth() is locale-aware and UTC-stable', () => {
     expect(formatMonth('en', '2025-01')).toBe('Jan 2025');
     expect(formatMonth('fr', '2025-01')).toBe('janv. 2025');
