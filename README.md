@@ -34,7 +34,7 @@ English lives at `/portfolio/`, French at `/portfolio/fr/`. The nav toggle switc
 
 ### Adding a language (e.g. German)
 1. `site.config.mjs`: `LANGS = ['en', 'fr', 'de']`.
-2. `src/i18n/ui.ts`: add a `de` block (the type check lists every missing key).
+2. `src/i18n/ui.ts`: add a `de` block and include it in the exported `ui` map (the type check lists every missing key).
 3. Add `de` values to every `{ en, fr }` field and app frontmatter (the build fails until all exist).
 Pages (`/de/`, `/de/blog/`), hreflang tags and the toggle are generated automatically.
 

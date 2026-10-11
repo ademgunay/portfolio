@@ -8,7 +8,7 @@ module.exports = {
     collect: {
       startServerCommand: 'npm run preview',
       startServerReadyPattern: 'localhost:4321',
-      url: [`${origin}${base}`, `${origin}${base}blog/`, `${origin}${base}/fr/`],
+      url: [`${origin}${base}`, `${origin}${base}blog/`, `${origin}${base}fr/`],
       numberOfRuns: 3,
     },
     assert: {
