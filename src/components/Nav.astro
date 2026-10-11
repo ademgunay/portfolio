@@ -35,15 +35,11 @@ const cv = withBase(profile.cvPath);
   const onScroll = () => nav?.classList.toggle('nav-scrolled', window.scrollY > 24);
   addEventListener('scroll', onScroll, { passive: true });
   onScroll();
-  menu?.addEventListener('toggle', () => {
-    if (menu.open) addEventListener('keydown', onKey);
-    else removeEventListener('keydown', onKey);
-  });
-  function onKey(e: KeyboardEvent) {
+  addEventListener('keydown', (e) => {
     if (e.key !== 'Escape' || !menu?.open) return;
     menu.removeAttribute('open');
     menu.querySelector('summary')?.focus();
-  }
+  });
   menu?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => menu.removeAttribute('open')));
 </script>
 <style is:global>
