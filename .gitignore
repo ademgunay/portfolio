@@ -8,5 +8,4 @@ playwright-report/
 .lighthouseci/
 .vitest/
 localhost-*.report.*
-manifest.json
 docs/superpowers/

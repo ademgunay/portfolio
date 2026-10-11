@@ -21,6 +21,6 @@ module.exports = {
         'total-blocking-time': ['error', { maxNumericValue: 200 }],
       },
     },
-    upload: { target: 'temporary-public-storage' },
+    upload: { target: 'temporary-public-storage', outputDir: '.lighthouseci' },
   },
 };
