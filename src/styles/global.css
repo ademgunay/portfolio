@@ -32,3 +32,4 @@ html.lenis, html.lenis body { height: auto; }
 .showcase--enhanced [data-showcase-list] > li { grid-template-columns: 1fr; min-height: 100vh; align-content: center; }
 .showcase--enhanced [data-showcase-rail] { display: block; position: fixed; right: 2rem; top: 50%; transform: translateY(-50%); z-index: 40; transition: opacity 0.3s ease; }
 .showcase--enhanced:not(.showcase--in-view) [data-showcase-rail] { opacity: 0; pointer-events: none; }
+@media (max-width: 1399px) { .showcase--enhanced [data-showcase-body] { padding-right: 9rem; } } /* gutter for the fixed rail */

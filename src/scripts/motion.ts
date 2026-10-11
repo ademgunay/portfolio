@@ -22,10 +22,12 @@ function initLenis(): Lenis | null {
     if (!a || a.target === '_blank') return;
     const url = new URL(a.href, location.href);
     if (url.pathname !== location.pathname || !url.hash || url.hash === '#main') return;
-    const target = document.querySelector<HTMLElement>(url.hash);
+    const target = document.getElementById(decodeURIComponent(url.hash.slice(1)));
     if (!target) return;
     e.preventDefault();
     lenis.scrollTo(target, { offset: -NAV_OFFSET });
+    if (!target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+    target.focus({ preventScroll: true });
     history.pushState(null, '', url.hash);
   });
   return lenis;
@@ -71,7 +73,7 @@ function initShowcase(lenis: Lenis | null) {
   const items = Array.from(section.querySelectorAll<HTMLElement>('[data-showcase-list] > li'));
   const stage = Array.from(section.querySelectorAll<HTMLElement>('[data-stage-phone]'));
   const rail = Array.from(section.querySelectorAll<HTMLButtonElement>('[data-rail-index]'));
-  const glow = section.querySelector<HTMLElement>('[data-showcase-glow]');
+  let programmatic = false;
 
   const setActive = (i: number) => {
     stage.forEach((p, j) => {
@@ -79,8 +81,6 @@ function initShowcase(lenis: Lenis | null) {
       p.style.transform = j === i ? 'translateY(0)' : `translateY(${j < i ? -24 : 24}px)`;
     });
     rail.forEach((b, j) => b.setAttribute('aria-current', String(j === i)));
-    const accent = items[i]?.dataset.accent;
-    if (glow && accent) glow.style.background = `radial-gradient(600px circle at 25% 50%, ${accent}55, transparent 70%)`;
   };
 
   const mm = gsap.matchMedia();
@@ -90,7 +90,7 @@ function initShowcase(lenis: Lenis | null) {
     const triggers = items.map((item, i) =>
       ScrollTrigger.create({
         trigger: item, start: 'top center', end: 'bottom center',
-        onToggle: (self) => self.isActive && setActive(i),
+        onToggle: (self) => self.isActive && !programmatic && setActive(i),
       }),
     );
     const inView = ScrollTrigger.create({
@@ -100,9 +100,21 @@ function initShowcase(lenis: Lenis | null) {
     const onRail = (e: Event) => {
       const i = Number((e.currentTarget as HTMLElement).dataset.railIndex);
       const target = items[i];
-      if (lenis) lenis.scrollTo(target, { offset: 0 });
-      else target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      programmatic = true;
       setActive(i);
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        programmatic = false;
+        setActive(i);
+      };
+      if (lenis) lenis.scrollTo(target, { offset: 0, onComplete: finish });
+      else {
+        addEventListener('scrollend', finish, { once: true });
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      setTimeout(finish, lenis ? 2500 : 1000);
     };
     rail.forEach((b) => b.addEventListener('click', onRail));
     ScrollTrigger.refresh();
@@ -111,7 +123,7 @@ function initShowcase(lenis: Lenis | null) {
       inView.kill();
       rail.forEach((b) => b.removeEventListener('click', onRail));
       section.classList.remove('showcase--enhanced', 'showcase--in-view');
-      if (glow) glow.style.background = '';
+      programmatic = false;
     };
   });
 }

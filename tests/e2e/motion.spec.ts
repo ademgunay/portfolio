@@ -62,8 +62,65 @@ test('scrolling through the showcase causes no layout shift', async ({ page }, i
   }
   await page.waitForTimeout(500);
   const cls = await page.evaluate(() => (window as any).__cls);
-  console.log(`MEASURED_CLS=${cls} scrolled_to=${end}`);
   expect(cls).toBeLessThanOrEqual(0.1);
+});
+
+test('enhanced: every stage phone screenshot loads', async ({ page }, info) => {
+  test.skip(isMobile(info.project.name));
+  await gotoHome(page);
+  await expect(page.locator('[data-showcase]')).toHaveClass(/showcase--enhanced/);
+  await page.evaluate(() => document.querySelector('[data-showcase-list] > li')!.scrollIntoView({ block: 'center' }));
+  const imgs = await page.locator('[data-stage-phone] img').all();
+  expect(imgs.length).toBeGreaterThan(0);
+  for (const img of imgs) {
+    await expect.poll(() => img.evaluate((el: HTMLImageElement) => el.naturalWidth)).toBeGreaterThan(0);
+  }
+});
+
+test('rail does not overlap app text at 1040x800', async ({ page }, info) => {
+  test.skip(isMobile(info.project.name));
+  await page.setViewportSize({ width: 1040, height: 800 });
+  await gotoHome(page);
+  await expect(page.locator('[data-showcase]')).toHaveClass(/showcase--enhanced/);
+  await page.evaluate(() => document.querySelector('[data-showcase-list] > li')!.scrollIntoView({ block: 'center' }));
+  await expect(page.locator('[data-showcase]')).toHaveClass(/showcase--in-view/);
+  await expect(page.locator('[data-showcase-rail]')).toHaveCSS('opacity', '1');
+  await page.waitForTimeout(400);
+  const overlaps = await page.evaluate(() => {
+    const r = document.querySelector('[data-showcase-rail] ul')!.getBoundingClientRect();
+    const hits: string[] = [];
+    document.querySelectorAll('.app-text').forEach((t) => {
+      // measure the widest text child boxes, only those on screen
+      t.querySelectorAll<HTMLElement>('h3, p, div, ul, a').forEach((c) => {
+        const b = c.getBoundingClientRect();
+        if (b.width === 0 || b.height === 0 || b.bottom < 0 || b.top > innerHeight) return;
+        if (b.left < r.right && b.right > r.left && b.top < r.bottom && b.bottom > r.top) hits.push(c.tagName + ':' + Math.round(b.right));
+      });
+    });
+    return hits;
+  });
+  expect(overlaps).toEqual([]);
+});
+
+test('rail jump does not flicker through intermediate apps', async ({ page }, info) => {
+  test.skip(isMobile(info.project.name));
+  await gotoHome(page);
+  await page.evaluate(() => document.querySelector('[data-showcase-list] > li')!.scrollIntoView({ block: 'center' }));
+  await expect(page.locator('[data-showcase]')).toHaveClass(/showcase--in-view/);
+  await expect(page.locator('[data-stage-phone="0"]')).toHaveCSS('opacity', '1');
+  await page.evaluate(() => {
+    const seen = new Set<number>([0]);
+    (window as any).__seen = seen;
+    document.querySelectorAll<HTMLElement>('[data-stage-phone]').forEach((el) => {
+      const i = Number(el.dataset.stagePhone);
+      new MutationObserver(() => { if (el.style.opacity === '1') seen.add(i); }).observe(el, { attributes: true, attributeFilter: ['style'] });
+    });
+  });
+  await page.locator('[data-rail-index="5"]').click();
+  await expect(page.locator('[data-stage-phone="5"]')).toHaveCSS('opacity', '1');
+  await page.waitForTimeout(1500);
+  const seen = await page.evaluate(() => [...(window as any).__seen].sort());
+  expect(seen).toEqual([0, 5]);
 });
 
 test('mobile: stacked cards, no enhancement', async ({ page }, info) => {
