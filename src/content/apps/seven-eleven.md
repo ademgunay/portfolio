@@ -6,7 +6,7 @@ role: Senior Android Developer
 stack: [Kotlin, Java, MVVM, RxJava, Firebase]
 storeLinks: { appStore: 'https://apps.apple.com/th/app/7-eleven-th/id514262377', playStore: 'https://play.google.com/store/apps/details?id=asuk.com.android.app' }
 status: live
-screenshots: [../../assets/apps/seven-eleven/1.png, ../../assets/apps/seven-eleven/2.png, ../../assets/apps/seven-eleven/3.png]
+screenshots: [../../assets/apps/seven-eleven/1.jpg, ../../assets/apps/seven-eleven/2.jpg, ../../assets/apps/seven-eleven/3.jpg]
 accentColor: '#f58220'
 order: 4
 ---

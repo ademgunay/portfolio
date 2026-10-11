@@ -6,7 +6,7 @@ role: Lead Frontend Engineer
 stack: [Flutter, Dart, BLoC/Cubit, GetIt, Firebase, Flutter Web, CI/CD]
 storeLinks: { appStore: 'https://apps.apple.com/th/app/wyzauto/id1559254653', playStore: 'https://play.google.com/store/apps/details?id=com.wyzauto.android' }
 status: live
-screenshots: [../../assets/apps/wyzauto/1.png, ../../assets/apps/wyzauto/2.png, ../../assets/apps/wyzauto/3.png]
+screenshots: [../../assets/apps/wyzauto/1.jpg, ../../assets/apps/wyzauto/2.jpg, ../../assets/apps/wyzauto/3.jpg]
 accentColor: '#1f6feb'
 order: 1
 ---
