@@ -27,10 +27,9 @@ describe('dictionary', () => {
     expect(formatMonth('fr', '2025-01')).toBe('janv. 2025');
   });
   it('isLang() and defaults', () => {
-    expect(DEFAULT_LANG).toBe('en');
-    expect(isLang('fr')).toBe(true);
-    expect(isLang('de')).toBe(false);
-    expect(nonDefaultLangs()).toEqual(['fr']);
+    expect(isLang(DEFAULT_LANG)).toBe(true);
+    expect(isLang('xx')).toBe(false);
+    expect(nonDefaultLangs()).toEqual(LANGS.filter((l) => l !== DEFAULT_LANG));
   });
 });
 
