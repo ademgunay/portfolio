@@ -1,12 +1,12 @@
 ---
 import { profile } from '../content/profile';
-import { withBase } from '../lib/url';
+import { cvHref } from '../lib/cv';
 import { t, type Lang } from '../i18n/ui';
 import SectionHeading from './SectionHeading.astro';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
-const cvHref = withBase(lang === 'fr' && profile.cvPathFr ? profile.cvPathFr : profile.cvPath);
+const cv = cvHref(lang);
 const links = [
   { label: 'LinkedIn', href: profile.links.linkedin },
   { label: 'GitHub', href: profile.links.github },
@@ -26,7 +26,7 @@ const links = [
     <ul class="flex flex-wrap justify-center gap-4 font-mono text-sm">
       <li><a href={`mailto:${profile.email}`} class="text-muted hover:text-text">{t(lang, 'contact.email')}</a></li>
       {links.map((l) => <li><a href={l.href} target="_blank" rel="noopener noreferrer" class="text-muted hover:text-text">{l.label} ↗</a></li>)}
-      <li><a href={cvHref} download class="text-muted hover:text-text">{t(lang, 'contact.cv')}</a></li>
+      <li><a href={cv} download class="text-muted hover:text-text">{t(lang, 'contact.cv')}</a></li>
     </ul>
   </div>
 </section>

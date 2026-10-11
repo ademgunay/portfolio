@@ -2,13 +2,13 @@
 import { getCollection } from 'astro:content';
 import PhoneFrame from './PhoneFrame.astro';
 import { profile } from '../content/profile';
-import { withBase } from '../lib/url';
+import { cvHref } from '../lib/cv';
 import { localePath } from '../i18n/paths';
 import { pick, t, type Lang } from '../i18n/ui';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
-const cvHref = withBase(lang === 'fr' && profile.cvPathFr ? profile.cvPathFr : profile.cvPath);
+const cv = cvHref(lang);
 
 const apps = (await getCollection('apps')).sort((a, b) => a.data.order - b.data.order).slice(0, 3);
 const heroImages = apps.map((a) => a.data.screenshots[0]);
@@ -27,7 +27,7 @@ const heroImages = apps.map((a) => a.data.screenshots[0]);
     )}
     <div class="mt-8 flex flex-wrap gap-4">
       <a href={localePath(lang, '/#apps')} class="rounded-lg bg-blue px-5 py-3 font-semibold text-bg transition hover:brightness-110">{t(lang, 'hero.seeApps')}</a>
-      <a href={cvHref} download class="rounded-lg border border-border px-5 py-3 font-semibold transition hover:border-blue">{t(lang, 'cta.downloadCv')}</a>
+      <a href={cv} download class="rounded-lg border border-border px-5 py-3 font-semibold transition hover:border-blue">{t(lang, 'cta.downloadCv')}</a>
     </div>
   </div>
   <div class="relative hidden md:block" data-hero-phone>

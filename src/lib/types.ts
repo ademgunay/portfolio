@@ -11,7 +11,8 @@ export interface Profile {
   links: { linkedin: string; github: string; medium: string };
   languages: { name: Localized<string>; level: Localized<string> }[];
   cvPath: string;
-  cvPathFr?: string;
+  /** Per-language CV overrides; languages without an entry use `cvPath`. */
+  cvPaths?: Partial<Localized<string>>;
   openToOpportunities: boolean;
   photo?: ImageMetadata;
   bio: Localized<string[]>;
