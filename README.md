@@ -39,7 +39,7 @@ One-time setup:
 
 ## Custom domain (gunayadem.dev)
 
-1. `astro.config.mjs`: `site: 'https://gunayadem.dev'`, `base: '/'`.
+1. Edit `site.config.mjs`: `SITE = 'https://gunayadem.dev'`, `BASE = '/'`. Astro, Playwright and Lighthouse CI all read it, so nothing else needs changing.
 2. Add `public/CNAME` containing `gunayadem.dev`.
 3. Point DNS at GitHub Pages and set the domain in repo Settings → Pages.
 

@@ -21,7 +21,7 @@ test('nav has section links and Writing link', async ({ page }) => {
 test('SEO meta and JSON-LD are present', async ({ page }) => {
   await gotoHome(page);
   await expect(page).toHaveTitle(/Adem Gunay/);
-  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /\/portfolio\/og-image\.png$/);
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', new RegExp(`${BASE.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}og-image\\.png$`));
   const ld = JSON.parse((await page.locator('script[type="application/ld+json"]').textContent()) ?? '{}');
   expect(ld['@type']).toBe('Person');
   expect(ld.sameAs).toContain('https://medium.com/@gunayadem.dev');
