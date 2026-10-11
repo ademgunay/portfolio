@@ -2,6 +2,8 @@
 import '@fontsource-variable/space-grotesk';
 import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/600.css';
+import sgLatin from '@fontsource-variable/space-grotesk/files/space-grotesk-latin-wght-normal.woff2?url';
+import jbLatin400 from '@fontsource/jetbrains-mono/files/jetbrains-mono-latin-400-normal.woff2?url';
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
@@ -47,6 +49,8 @@ const personLd = {
     <link rel="icon" type="image/svg+xml" href={withBase('/favicon.svg')} />
     <link rel="sitemap" href={withBase('/sitemap-index.xml')} />
     <link rel="alternate" type="application/rss+xml" title={`${profile.name} — Writing`} href={withBase('/rss.xml')} />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href={sgLatin} />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href={jbLatin400} />
     <meta name="theme-color" content="#0d1117" />
     <meta property="og:type" content={type} />
     <meta property="og:title" content={title} />
