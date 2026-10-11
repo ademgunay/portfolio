@@ -41,3 +41,15 @@ test('no "open to opportunities" badge by default', async ({ page }) => {
   await gotoHome(page);
   await expect(page.getByText('Open to opportunities')).toHaveCount(0);
 });
+
+test('mobile menu overlay stays full-screen after scroll', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await gotoHome(page);
+  await page.evaluate(() => window.scrollTo(0, 1200));
+  await page.waitForFunction(() => window.scrollY > 24);
+  await page.getByText('menu', { exact: true }).click();
+  const list = page.locator('[data-mobile-menu] ul');
+  await expect(list.getByRole('link', { name: 'Experience' })).toBeVisible();
+  const box = await list.boundingBox();
+  expect(box!.height).toBeGreaterThanOrEqual(700);
+});

@@ -26,6 +26,6 @@ const heroImages = apps.map((a) => a.data.screenshots[0]);
   </div>
   <div class="relative hidden md:block" data-hero-phone>
     <div aria-hidden="true" class="absolute inset-0 -z-10 rounded-full bg-purple/30 blur-3xl"></div>
-    <PhoneFrame images={heroImages} alt={`Screens from ${apps.map((a) => a.data.name).join(', ')}`} tilt eager />
+    <PhoneFrame images={heroImages} alt={`Screens from ${apps.map((a) => a.data.name).join(', ')}`} tilt />
   </div>
 </section>
