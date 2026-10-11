@@ -16,6 +16,7 @@ test('desktop with motion: showcase is enhanced, rail navigates, stage phone fol
   const rail = page.locator('[data-rail-index="3"]');
   await tabTo(page, '[data-rail-index="3"]');
   await expect(rail).toBeFocused();
+  await page.waitForTimeout(800); // let the focus-induced scroll settle before activating
   await page.keyboard.press('Enter');
   await expect(page.locator('[data-showcase-list] > li[data-index="3"] h3')).toBeInViewport();
   await expect(page.locator('[data-rail-index="3"]')).toHaveAttribute('aria-current', 'true');
