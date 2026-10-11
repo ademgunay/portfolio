@@ -1,6 +1,7 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
+import Snap from 'lenis/snap';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -97,16 +98,30 @@ function initShowcase(lenis: Lenis | null) {
       trigger: section, start: 'top center', end: 'bottom center',
       onToggle: (self) => section.classList.toggle('showcase--in-view', self.isActive),
     });
+    // Proximity snap: easing to the nearest app only when released within 30% of a viewport of it.
+    // Lenis exists only on non-touch / no-reduced-motion, so this is already desktop-only.
+    const snap = lenis
+      ? new Snap(lenis, {
+          type: 'proximity',
+          distanceThreshold: '30%',
+          duration: 0.6,
+          easing: (t) => 1 - Math.pow(1 - t, 3),
+          debounce: 150,
+        })
+      : null;
+    snap?.addElements(items, { align: ['start'] });
     const onRail = (e: Event) => {
       const i = Number((e.currentTarget as HTMLElement).dataset.railIndex);
       const target = items[i];
       programmatic = true;
+      snap?.stop();
       setActive(i);
       let done = false;
       const finish = () => {
         if (done) return;
         done = true;
         programmatic = false;
+        snap?.start();
         setActive(i);
       };
       if (lenis) lenis.scrollTo(target, { offset: 0, onComplete: finish });
@@ -121,6 +136,7 @@ function initShowcase(lenis: Lenis | null) {
     return () => {
       triggers.forEach((t) => t.kill());
       inView.kill();
+      snap?.destroy();
       rail.forEach((b) => b.removeEventListener('click', onRail));
       section.classList.remove('showcase--enhanced', 'showcase--in-view');
       programmatic = false;

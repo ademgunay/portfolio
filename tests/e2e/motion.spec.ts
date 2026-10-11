@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { BASE, gotoHome, tabTo } from './helpers';
 
 const isMobile = (name: string) => name === 'mobile';
@@ -159,6 +159,98 @@ test('rail jump does not flicker through intermediate apps', async ({ page }, in
   await page.waitForTimeout(1500);
   const seen = await page.evaluate(() => [...(window as any).__seen].sort());
   expect(seen).toEqual([0, 5]);
+});
+
+// --- snap scrolling between apps (desktop only) ---
+const snapY = (page: Page, i: number) =>
+  page.evaluate((n) => Math.ceil(document.querySelectorAll('[data-showcase-list] > li')[n].getBoundingClientRect().top + scrollY), i);
+const scrollNow = (page: Page, y: number) => page.evaluate((v) => scrollTo(0, v), y);
+const settle = async (page: Page, ms = 1000) => {
+  let last = -1;
+  let since = Date.now();
+  await expect.poll(async () => {
+    const y = await page.evaluate(() => scrollY);
+    if (Math.abs(y - last) > 0.5) { last = y; since = Date.now(); }
+    return Date.now() - since >= ms;
+  }, { timeout: 8000, intervals: [100] }).toBe(true);
+  return last;
+};
+
+test.describe('showcase snap scrolling', () => {
+  test.beforeEach(async ({ page }, info) => {
+    test.skip(isMobile(info.project.name));
+    await gotoHome(page);
+    await expect(page.locator('[data-showcase]')).toHaveClass(/showcase--enhanced/);
+    await page.mouse.move(700, 450);
+  });
+
+  test('released within 30% of an app, it eases to that app', async ({ page }) => {
+    await page.waitForLoadState('load');
+    const s1 = await snapY(page, 1);
+    const vh = 900;
+    await scrollNow(page, s1 - 0.15 * vh - 80);
+    await settle(page, 300);
+    await page.mouse.wheel(0, 80);
+    await expect.poll(async () => Math.abs((await snapY(page, 1)) - (await page.evaluate(() => scrollY))), { timeout: 5000 }).toBeLessThanOrEqual(2);
+    const y = await settle(page, 500);
+    expect(Math.abs(y - (await snapY(page, 1)))).toBeLessThanOrEqual(2);
+  });
+
+  test('released between two apps (beyond 30% of both), it stays put', async ({ page }) => {
+    const s1 = await snapY(page, 1);
+    const s2 = await snapY(page, 2);
+    const mid = (s1 + s2) / 2;
+    await scrollNow(page, mid - 80);
+    await settle(page, 300);
+    await page.mouse.wheel(0, 80);
+    const y0 = await settle(page, 400);
+    await page.waitForTimeout(1000);
+    const y1 = await page.evaluate(() => scrollY);
+    expect(Math.abs(y1 - y0)).toBeLessThanOrEqual(5);
+    expect(Math.abs(y1 - mid)).toBeLessThanOrEqual(20);
+  });
+
+  test('scrolling past the last app into Experience is not pulled back', async ({ page }) => {
+    const last = await snapY(page, 5);
+    await scrollNow(page, last + 200);
+    await settle(page, 300);
+    const dist = await page.evaluate(() => document.querySelector('#experience')!.getBoundingClientRect().top - 300);
+    for (let sent = 0; sent < dist; sent += 200) { // fixed total input: Lenis lags the wheel, so don't read scrollY mid-flight
+      await page.mouse.wheel(0, Math.min(200, dist - sent));
+      await page.waitForTimeout(40);
+    }
+    const y = await settle(page, 700);
+    expect(y).toBeGreaterThan(last + 900 * 0.6);
+    await expect(page.locator('#experience')).toBeInViewport();
+  });
+});
+
+test('no snapping on mobile', async ({ page }, info) => {
+  test.skip(!isMobile(info.project.name));
+  await gotoHome(page);
+  const apps = await page.evaluate(() => document.querySelector('#apps')!.getBoundingClientRect().top + scrollY);
+  await scrollNow(page, apps + 400);
+  await settle(page, 300);
+  await page.mouse.wheel(0, 60);
+  const y0 = await settle(page, 400);
+  await page.waitForTimeout(1000);
+  expect(Math.abs((await page.evaluate(() => scrollY)) - y0)).toBeLessThanOrEqual(1);
+});
+
+test.describe('reduced motion snap', () => {
+  test.use({ reducedMotion: 'reduce' });
+  test('no snapping', async ({ page }, info) => {
+    test.skip(isMobile(info.project.name));
+    await gotoHome(page);
+    await page.mouse.move(700, 450);
+    const s1 = await page.evaluate(() => document.querySelectorAll('[data-showcase-list] > li')[1].getBoundingClientRect().top + scrollY);
+    await scrollNow(page, s1 - 200);
+    await settle(page, 300);
+    await page.mouse.wheel(0, 60);
+    const y0 = await settle(page, 400);
+    await page.waitForTimeout(1000);
+    expect(Math.abs((await page.evaluate(() => scrollY)) - y0)).toBeLessThanOrEqual(1);
+  });
 });
 
 test('mobile: stacked cards, no enhancement', async ({ page }, info) => {
