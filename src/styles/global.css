@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-bg: #0d1117;
+  --color-surface: #161b22;
+  --color-border: #30363d;
+  --color-text: #e6edf3;
+  --color-muted: #8b949e;
+  --color-blue: #58a6ff;
+  --color-green: #7ee787;
+  --color-purple: #8957e5;
+  --font-sans: 'Space Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  html { background: var(--color-bg); color: var(--color-text); font-family: var(--font-sans); scroll-padding-top: 5rem; }
+  body { min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  ::selection { background: color-mix(in srgb, var(--color-blue) 35%, transparent); }
+  :focus-visible { outline: 2px solid var(--color-blue); outline-offset: 3px; border-radius: 4px; }
+}
+
+/* Lenis recommended styles */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-stopped { overflow: hidden; }
