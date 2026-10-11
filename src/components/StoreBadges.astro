@@ -1,0 +1,24 @@
+---
+interface Props { links: { playStore?: string; appStore?: string; web?: string }; status: 'live' | 'delisted' | 'internal'; name: string }
+const { links, status, name } = Astro.props;
+const items = [
+  links.appStore && { href: links.appStore, label: 'App Store' },
+  links.playStore && { href: links.playStore, label: 'Google Play' },
+  links.web && { href: links.web, label: 'Web' },
+].filter(Boolean) as { href: string; label: string }[];
+const note = status === 'delisted' ? 'No longer on the stores' : status === 'internal' ? 'Internal app — not publicly available' : null;
+---
+{status === 'live' && items.length > 0 && (
+  <ul class="mt-6 flex flex-wrap gap-3" data-store-row>
+    {items.map((i) => (
+      <li>
+        <a href={i.href} target="_blank" rel="noopener noreferrer" data-store-badge
+          class="inline-flex items-center gap-2 rounded-lg border border-border bg-surface px-4 py-2 font-mono text-sm transition hover:border-blue"
+          aria-label={`${name} on ${i.label} (opens in a new tab)`}>
+          {i.label} <span aria-hidden="true">↗</span>
+        </a>
+      </li>
+    ))}
+  </ul>
+)}
+{note && <p class="mt-6 font-mono text-sm text-muted" data-status-note>// {note}</p>}

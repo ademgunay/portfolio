@@ -1,0 +1,31 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { render } from 'astro:content';
+import PhoneFrame from './PhoneFrame.astro';
+import StoreBadges from './StoreBadges.astro';
+
+interface Props { app: CollectionEntry<'apps'>; index: number; total: number }
+const { app, index, total } = Astro.props;
+const { Content } = await render(app);
+const d = app.data;
+const pad = (n: number) => String(n).padStart(2, '0');
+---
+<li
+  class="app-item grid items-center gap-10 py-16 md:grid-cols-[280px_1fr] md:gap-16"
+  data-app={app.id} data-index={index} data-accent={d.accentColor} data-status={d.status} data-reveal
+>
+  <div data-card-phone>
+    <PhoneFrame images={d.screenshots} alt={`${d.name} app screenshot`} />
+  </div>
+  <div class="app-text">
+    <p class="font-mono text-sm text-muted">{pad(index + 1)} / {pad(total)}</p>
+    <h3 class="mt-2 text-3xl font-bold md:text-4xl" style={`--accent:${d.accentColor}`}>{d.name}</h3>
+    <p class="mt-2 font-mono text-sm text-muted">{d.company} · {d.period}</p>
+    <p class="mt-4 text-lg text-blue">{d.role}</p>
+    <div class="prose-invert mt-4 max-w-xl text-muted [&_p]:leading-relaxed"><Content /></div>
+    <ul class="mt-6 flex flex-wrap gap-2" data-stack>
+      {d.stack.map((s) => <li class="rounded-full border border-border px-3 py-1 font-mono text-xs">{s}</li>)}
+    </ul>
+    <StoreBadges links={d.storeLinks} status={d.status} name={d.name} />
+  </div>
+</li>
