@@ -5,7 +5,13 @@ const same = (items: string[]) => ({ en: items, fr: items });
 export const skills: SkillGroup[] = [
   { key: 'android', items: same(['Kotlin', 'Java', 'Coroutines', 'Dagger/Hilt', 'Koin', 'RxJava', 'Room', 'Jetpack']) },
   { key: 'flutter', items: same(['Dart', 'BLoC/Cubit', 'GetIt', 'GetX', 'Flutter Web']) },
-  { key: 'architecture', items: same(['MVVM', 'MVI', 'MVP', 'Clean Architecture', 'Modularization']) },
+  {
+    key: 'architecture',
+    items: {
+      en: ['MVVM', 'MVI', 'MVP', 'Clean Architecture', 'Modularization'],
+      fr: ['MVVM', 'MVI', 'MVP', 'Clean Architecture', 'Modularisation'],
+    },
+  },
   { key: 'delivery', items: same(['CI/CD', 'Play Store', 'App Store', 'Git']) },
   { key: 'firebase', items: same(['Firestore', 'Auth', 'Cloud Messaging', 'Hosting']) },
   { key: 'testing', items: same(['JUnit', 'Mockito']) },

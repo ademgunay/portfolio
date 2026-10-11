@@ -16,7 +16,7 @@ export const experience: Job[] = [
       fr: [
         'Pilotage de la livraison d’une marketplace de pneus à grande échelle, étendue aux pièces détachées automobiles grâce à une refonte du code selon les bonnes pratiques du secteur.',
         'Conception d’un CMS côté vendeurs pour la gestion du catalogue et des produits.',
-        'Mise en place de l’architecture Flutter (Cubit/BLoC, GetIt, stockage local) et du CI/CD vers Google Play et l’App Store ; mentorat de l’équipe frontend.',
+        'Mise en place de l’architecture Flutter (Cubit/BLoC, GetIt, stockage local) et du CI/CD vers Google Play et l’App Store ; mentorat de l’équipe frontend.',
       ],
     },
   },
@@ -36,7 +36,7 @@ export const experience: Job[] = [
       fr: [
         'Développement et maintenance de fonctionnalités dans les bases de code Kotlin et Dart de l’appli Android Pi Financial.',
         'Réduction de la dette technique pour améliorer la scalabilité et automatisation du processus de release.',
-        'Direction de l’équipe Android : partage de connaissances, revues de PR, support technique au PO et accompagnement de l’équipe.',
+        'Direction de l’équipe Android : partage de connaissances, revues de PR, support technique au PO et accompagnement de l’équipe.',
       ],
     },
   },
@@ -89,7 +89,7 @@ export const experience: Job[] = [
     roles: [{ title: { en: 'Full-stack Developer', fr: 'Développeur full-stack' }, start: '2017-10', end: '2018-02' }],
     highlights: {
       en: ['Developed and tested the Java Spring backend and Angular web app; software analysis.'],
-      fr: ['Développement et tests du backend Java Spring et de l’appli web Angular ; analyse logicielle.'],
+      fr: ['Développement et tests du backend Java Spring et de l’appli web Angular ; analyse logicielle.'],
     },
   },
 ];

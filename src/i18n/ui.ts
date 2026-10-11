@@ -95,7 +95,7 @@ const fr: Record<UiKey, string> = {
   'writing.external': 'Externe',
   'writing.inEnglish': 'En anglais',
   'contact.title': 'Parlons-en',
-  'contact.lead': 'Vous recrutez pour un poste de lead mobile ou Flutter, ou vous voulez simplement échanger sur Android et Flutter ? Ma boîte mail est ouverte.',
+  'contact.lead': 'Vous recrutez pour un poste de lead mobile ou Flutter, ou vous voulez simplement échanger sur Android et Flutter ? Ma boîte mail est ouverte.',
   'contact.copyTitle': 'Copier l’adresse e-mail',
   'contact.copyHint': 'Cette action copie l’adresse dans votre presse-papiers.',
   'contact.email': 'E-mail ↗',
