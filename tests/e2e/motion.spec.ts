@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { BASE, gotoHome } from './helpers';
+import { BASE, gotoHome, tabTo } from './helpers';
 
 const isMobile = (name: string) => name === 'mobile';
 
@@ -14,9 +14,9 @@ test('desktop with motion: showcase is enhanced, rail navigates, stage phone fol
   await expect(page.locator('[data-showcase-stage]')).toBeVisible();
   await expect(page.locator('[data-card-phone]').first()).toBeHidden();
   const rail = page.locator('[data-rail-index="3"]');
-  await rail.focus();
+  await tabTo(page, '[data-rail-index="3"]');
   await expect(rail).toBeFocused();
-  await rail.click();
+  await page.keyboard.press('Enter');
   await expect(page.locator('[data-showcase-list] > li[data-index="3"] h3')).toBeInViewport();
   await expect(page.locator('[data-rail-index="3"]')).toHaveAttribute('aria-current', 'true');
   await expect(page.locator('[data-stage-phone="3"]')).toHaveCSS('opacity', '1');
@@ -40,6 +40,23 @@ test('stage phone stays clear of the nav on a 1366x657 laptop', async ({ page },
   });
   expect(box.top).toBeGreaterThanOrEqual(64);
   expect(box.bottom).toBeLessThanOrEqual(box.vh);
+});
+
+test('rail is hidden from focus until the showcase is in view', async ({ page }, info) => {
+  test.skip(isMobile(info.project.name));
+  await gotoHome(page);
+  await expect(page.locator('[data-showcase]')).toHaveClass(/showcase--enhanced/);
+  await expect(page.locator('[data-showcase-rail]')).toHaveCSS('visibility', 'hidden');
+});
+
+test('page content is pre-hidden before motion runs (no paint-then-vanish flash)', async ({ page }, info) => {
+  test.skip(isMobile(info.project.name));
+  await page.route('**/*.js', (r) => r.abort());
+  await page.goto(BASE);
+  await expect(page.locator('html')).toHaveClass(/motion-ready/);
+  await expect(page.locator('[data-reveal]').first()).toHaveCSS('opacity', '0');
+  await expect(page.locator('html')).not.toHaveClass(/motion-ready/, { timeout: 5000 }); // 3s safety net
+  await expect(page.locator('[data-reveal]').first()).toHaveCSS('opacity', '1');
 });
 
 test('desktop resized below 1024px reverts to stacked cards (Review Focus #2)', async ({ page }, info) => {
@@ -162,6 +179,7 @@ test.describe('reduced motion', () => {
       await expect(el).toHaveCSS('opacity', '1');
     }
     await expect(page.locator('[data-typing]')).toHaveText('whoami');
+    await expect(page.locator('[data-typing]')).toBeVisible();
   });
 });
 

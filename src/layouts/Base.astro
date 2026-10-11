@@ -46,6 +46,15 @@ const personLd = {
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
+    <script is:inline>
+      (function () {
+        var d = document.documentElement;
+        if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        d.classList.add('motion-ready');
+        // Safety net: if motion.ts never runs, show everything again.
+        window.__motionFallback = setTimeout(function () { d.classList.remove('motion-ready'); }, 3000);
+      })();
+    </script>
     <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
   </head>
   <body class="bg-bg text-text">

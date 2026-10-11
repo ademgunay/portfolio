@@ -35,8 +35,8 @@ function initLenis(): Lenis | null {
 
 function initReveals() {
   gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((el) => {
-    gsap.from(el, {
-      opacity: 0, y: 16, duration: 0.7, ease: 'power2.out',
+    gsap.fromTo(el, { opacity: 0, y: 16 }, {
+      opacity: 1, y: 0, duration: 0.7, ease: 'power2.out',
       scrollTrigger: { trigger: el, start: 'top 85%', once: true },
     });
   });
@@ -46,8 +46,8 @@ function initTyping() {
   const el = document.querySelector<HTMLElement>('[data-typing]');
   if (!el) return;
   const text = el.textContent ?? '';
-  el.setAttribute('aria-label', text);
   el.textContent = '';
+  el.style.visibility = 'visible';
   let i = 0;
   const id = setInterval(() => {
     el.textContent = text.slice(0, ++i);
@@ -129,7 +129,7 @@ function initShowcase(lenis: Lenis | null) {
 }
 
 if (!prefersReduced) {
-  document.documentElement.classList.add('motion-ready');
+  clearTimeout((window as unknown as { __motionFallback?: number }).__motionFallback);
   const lenis = initLenis();
   initReveals();
   initTyping();

@@ -53,3 +53,14 @@ test('mobile menu overlay stays full-screen after scroll', async ({ page }) => {
   const box = await list.boundingBox();
   expect(box!.height).toBeGreaterThanOrEqual(700);
 });
+
+test('mobile menu closes on Escape and returns focus to the toggle', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await gotoHome(page);
+  const summary = page.locator('[data-mobile-menu] summary');
+  await summary.click();
+  await expect(page.locator('[data-mobile-menu]')).toHaveAttribute('open', '');
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[data-mobile-menu]')).not.toHaveAttribute('open', '');
+  await expect(summary).toBeFocused();
+});

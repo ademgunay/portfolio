@@ -13,12 +13,14 @@ const links = [
   <SectionHeading index="06" title="Let's talk" id="contact" />
   <p class="mx-auto max-w-xl text-lg text-muted" data-reveal>Hiring for a mobile or Flutter lead role, or just want to chat about Android and Flutter? My inbox is open.</p>
   <div class="mt-10 flex flex-col items-center gap-6" data-reveal>
-    <a href={`mailto:${profile.email}`} data-copy-email data-email={profile.email}
+    <a href={`mailto:${profile.email}`} data-copy-email data-email={profile.email} title="Copy email address" aria-describedby="copy-email-hint"
       class="rounded-xl border border-border bg-surface px-6 py-4 font-mono text-lg transition hover:border-blue md:text-2xl">
       {profile.email} <span class="text-muted text-sm" aria-hidden="true">⧉</span>
     </a>
+    <span id="copy-email-hint" class="sr-only">Activating this copies the address to your clipboard.</span>
     <p role="status" aria-live="polite" class="h-5 font-mono text-sm text-green" data-copy-toast></p>
     <ul class="flex flex-wrap justify-center gap-4 font-mono text-sm">
+      <li><a href={`mailto:${profile.email}`} class="text-muted hover:text-text">Email ↗</a></li>
       {links.map((l) => <li><a href={l.href} target="_blank" rel="noopener noreferrer" class="text-muted hover:text-text">{l.label} ↗</a></li>)}
       <li><a href={withBase(profile.cvPath)} download class="text-muted hover:text-text">CV ↓</a></li>
     </ul>
@@ -27,12 +29,17 @@ const links = [
 <script>
   const btn = document.querySelector<HTMLAnchorElement>('[data-copy-email]');
   const toast = document.querySelector<HTMLElement>('[data-copy-toast]');
+  let timer: ReturnType<typeof setTimeout> | undefined;
   btn?.addEventListener('click', async (e) => {
     if (!navigator.clipboard) return; // fall back to mailto
     e.preventDefault();
     try {
       await navigator.clipboard.writeText(btn.dataset.email ?? '');
-      if (toast) { toast.textContent = 'Email copied'; setTimeout(() => (toast.textContent = ''), 2500); }
+      if (toast) {
+        toast.textContent = 'Email copied';
+        clearTimeout(timer);
+        timer = setTimeout(() => (toast.textContent = ''), 2500);
+      }
     } catch {
       location.href = btn.href;
     }
