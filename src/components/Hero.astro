@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import PhoneFrame from './PhoneFrame.astro';
+import { profile } from '../content/profile';
+import { withBase } from '../lib/url';
+
+const apps = (await getCollection('apps')).sort((a, b) => a.data.order - b.data.order).slice(0, 3);
+const heroImages = apps.map((a) => a.data.screenshots[0]);
+---
+<section class="relative mx-auto grid min-h-[100svh] max-w-6xl items-center gap-12 px-4 pt-24 md:grid-cols-[1.4fr_1fr] md:px-8">
+  <div>
+    <p class="font-mono text-sm text-green"><span aria-hidden="true">$ </span><span data-typing>whoami</span></p>
+    <h1 class="mt-4 text-5xl font-bold tracking-tight md:text-7xl">{profile.name}</h1>
+    <p class="mt-3 text-xl text-blue md:text-2xl">{profile.title}</p>
+    <p class="mt-6 max-w-xl text-lg text-muted">{profile.tagline}</p>
+    <p class="mt-4 font-mono text-sm text-muted">// {profile.location}</p>
+    {profile.openToOpportunities && (
+      <p class="mt-4 inline-flex items-center gap-2 rounded-full border border-green/40 px-3 py-1 font-mono text-xs text-green">
+        <span class="h-2 w-2 rounded-full bg-green"></span>Open to opportunities
+      </p>
+    )}
+    <div class="mt-8 flex flex-wrap gap-4">
+      <a href={withBase('/#apps')} class="rounded-lg bg-blue px-5 py-3 font-semibold text-bg transition hover:brightness-110">See my apps</a>
+      <a href={withBase(profile.cvPath)} download class="rounded-lg border border-border px-5 py-3 font-semibold transition hover:border-blue">Download CV</a>
+    </div>
+  </div>
+  <div class="relative hidden md:block" data-hero-phone>
+    <div aria-hidden="true" class="absolute inset-0 -z-10 rounded-full bg-purple/30 blur-3xl"></div>
+    <PhoneFrame images={heroImages} alt={`Screens from ${apps.map((a) => a.data.name).join(', ')}`} tilt eager />
+  </div>
+</section>
