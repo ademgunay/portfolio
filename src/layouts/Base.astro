@@ -7,7 +7,7 @@ import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import { profile } from '../content/profile';
 import { withBase } from '../lib/url';
-import { LANGS, pick, t, type Lang } from '../i18n/ui';
+import { DEFAULT_LANG, LANGS, pick, t, type Lang } from '../i18n/ui';
 import { localePath, switchLocalePath } from '../i18n/paths';
 
 interface Props { lang: Lang; title?: string; description?: string; image?: string; type?: 'website' | 'article'; translated?: boolean }
@@ -20,9 +20,9 @@ const {
   translated = true,
 } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const alternateLangs = translated ? LANGS : LANGS.filter((l) => l === 'en');
+const alternateLangs = translated ? LANGS : LANGS.filter((l) => l === DEFAULT_LANG);
 const alternates = alternateLangs.map((l) => ({ lang: l, href: new URL(switchLocalePath(Astro.url.pathname, l), Astro.site).href }));
-const xDefault = alternates.find((a) => a.lang === 'en')!.href;
+const xDefault = alternates.find((a) => a.lang === DEFAULT_LANG)!.href;
 const ogImage = new URL(image, Astro.site).href;
 const personLd = {
   '@context': 'https://schema.org',
@@ -55,7 +55,7 @@ const personLd = {
     {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href} />)}
     <link rel="alternate" hreflang="x-default" href={xDefault} />
     <meta property="og:locale" content={t(lang, 'locale.og')} />
-    {LANGS.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={t(l, 'locale.og')} />)}
+    {alternateLangs.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={t(l, 'locale.og')} />)}
     <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
     <script is:inline>

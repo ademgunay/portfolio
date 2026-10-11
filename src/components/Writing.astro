@@ -3,7 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import { isExternal } from '../lib/posts-core';
 import { withBase } from '../lib/url';
 import { localePath } from '../i18n/paths';
-import { t, type Lang } from '../i18n/ui';
+import { DEFAULT_LANG, t, type Lang } from '../i18n/ui';
 import SectionHeading from './SectionHeading.astro';
 
 interface Props { posts: CollectionEntry<'blog'>[]; limit?: number; heading?: boolean; lang: Lang }
@@ -23,9 +23,12 @@ const fmt = (d: Date) => d.toLocaleDateString(t(lang, 'locale.date'), { year: 'n
             <a href={href} {...(ext ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
               class="group flex flex-col gap-1 py-5 md:flex-row md:items-baseline md:gap-6">
               <time datetime={p.data.date.toISOString()} class="w-24 shrink-0 font-mono text-sm text-muted">{fmt(p.data.date)}</time>
-              <span class="flex-1 text-lg group-hover:text-blue">{p.data.title}</span>
-              {ext && (
-                <span class="font-mono text-xs text-muted">↗ {p.data.publisher ?? t(lang, 'writing.external')}{lang !== 'en' && <> <span class="rounded border border-border px-1" lang="en" title={t(lang, 'writing.inEnglish')}>EN</span></>}</span>
+              <span class="flex-1 text-lg group-hover:text-blue" {...(lang !== DEFAULT_LANG ? { lang: DEFAULT_LANG } : {})}>{p.data.title}</span>
+              {(ext || lang !== DEFAULT_LANG) && (
+                <span class="font-mono text-xs text-muted">
+                  {ext && <>↗ {p.data.publisher ?? t(lang, 'writing.external')}</>}
+                  {lang !== DEFAULT_LANG && <>{ext && ' '}<span class="rounded border border-border px-1" lang={DEFAULT_LANG} aria-hidden="true">EN</span><span class="sr-only"> ({t(lang, 'writing.inEnglish')})</span></>}
+                </span>
               )}
             </a>
           </li>
